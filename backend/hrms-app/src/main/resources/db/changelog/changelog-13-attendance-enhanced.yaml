@@ -415,43 +415,43 @@ databaseChangeLog:
         - insert:
             tableName: sys_role_permission
             columns:
-              - column: { name: id, valueNumeric: 90020 }
+              - column: { name: id, valueNumeric: 90050 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 510 }
         - insert:
             tableName: sys_role_permission
             columns:
-              - column: { name: id, valueNumeric: 90021 }
+              - column: { name: id, valueNumeric: 90051 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 511 }
         - insert:
             tableName: sys_role_permission
             columns:
-              - column: { name: id, valueNumeric: 90022 }
+              - column: { name: id, valueNumeric: 90052 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 512 }
         - insert:
             tableName: sys_role_permission
             columns:
-              - column: { name: id, valueNumeric: 90023 }
+              - column: { name: id, valueNumeric: 90053 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 513 }
         - insert:
             tableName: sys_role_permission
             columns:
-              - column: { name: id, valueNumeric: 90024 }
+              - column: { name: id, valueNumeric: 90054 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 514 }
         - insert:
             tableName: sys_role_permission
             columns:
-              - column: { name: id, valueNumeric: 90025 }
+              - column: { name: id, valueNumeric: 90055 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 515 }
         - insert:
             tableName: sys_role_permission
             columns:
-              - column: { name: id, valueNumeric: 90026 }
+              - column: { name: id, valueNumeric: 90056 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 516 }
       rollback:

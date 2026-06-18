@@ -44,21 +44,25 @@ databaseChangeLog:
         - insert:
             tableName: sys_role_permission
             columns:
+              - column: { name: id, valueNumeric: 90100 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 9001 }
         - insert:
             tableName: sys_role_permission
             columns:
+              - column: { name: id, valueNumeric: 90101 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 9002 }
         - insert:
             tableName: sys_role_permission
             columns:
+              - column: { name: id, valueNumeric: 90102 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 9003 }
         - insert:
             tableName: sys_role_permission
             columns:
+              - column: { name: id, valueNumeric: 90103 }
               - column: { name: role_id, valueNumeric: 1 }
               - column: { name: permission_id, valueNumeric: 9004 }
       rollback:
