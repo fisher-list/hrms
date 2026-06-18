@@ -19,6 +19,7 @@ import com.hrms.common.user.SysUserMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.security.SecureRandom;
 import java.util.Map;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,31 @@ public class HireFormService {
     private final SysUserMapper sysUserMapper;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    /**
+     * Generate a random password with at least 8 characters containing uppercase, lowercase and digits.
+     */
+    private String generateRandomPassword(int length) {
+        if (length < 8) length = 8;
+        StringBuilder sb = new StringBuilder(length);
+        // Ensure at least one of each category
+        sb.append(PASSWORD_CHARS.charAt(SECURE_RANDOM.nextInt(26)));           // uppercase
+        sb.append(PASSWORD_CHARS.charAt(26 + SECURE_RANDOM.nextInt(26)));      // lowercase
+        sb.append(PASSWORD_CHARS.charAt(52 + SECURE_RANDOM.nextInt(10)));      // digit
+        for (int i = 3; i < length; i++) {
+            sb.append(PASSWORD_CHARS.charAt(SECURE_RANDOM.nextInt(PASSWORD_CHARS.length())));
+        }
+        // Shuffle
+        char[] arr = sb.toString().toCharArray();
+        for (int i = arr.length - 1; i > 0; i--) {
+            int j = SECURE_RANDOM.nextInt(i + 1);
+            char tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+        }
+        return new String(arr);
+    }
 
     /**
      * Create a new hire form with status=PENDING.
@@ -140,16 +166,24 @@ public class HireFormService {
         contract.setContractType("FIXED");
         contract.setStartDate(form.getHireDate());
         contract.setStatus("ACTIVE");
+        // Set contract endDate from snapshot, default to hireDate + 3 years
+        if (emp.getContractEnd() != null) {
+            contract.setEndDate(emp.getContractEnd());
+        } else {
+            contract.setEndDate(form.getHireDate().plusYears(3));
+        }
         contractMapper.insert(contract);
 
-        // Create system user (username = empNo, password = last 6 chars of empNo as placeholder)
+        // Create system user (username = empNo, password = random with policy compliance)
+        String tempPassword = generateRandomPassword(10);
         SysUser user = new SysUser();
         user.setUsername(emp.getEmpNo());
-        user.setPasswordHash(passwordEncoder.encode(emp.getEmpNo().substring(emp.getEmpNo().length() - 6)));
+        user.setPasswordHash(passwordEncoder.encode(tempPassword));
         user.setNickname(form.getAccountName());
         user.setEmployeeId(emp.getId());
         user.setStatus("ACTIVE");
         sysUserMapper.insert(user);
+        log.debug("Initial password for {}: {}", emp.getEmpNo(), tempPassword);
 
         // Increment position headcount
         positionService.incrOccupied(form.getPositionId());

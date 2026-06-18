@@ -101,10 +101,10 @@ public class PayrollService {
         LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
         LocalDate lastDayOfMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.lengthOfMonth());
 
-        // Find eligible employees
+        // Find eligible employees (ACTIVE or PROBATION status)
         List<HrEmployee> employees = employeeMapper.selectList(
                 new LambdaQueryWrapper<HrEmployee>()
-                        .eq(HrEmployee::getStatus, "ACTIVE")
+                        .in(HrEmployee::getStatus, "ACTIVE", "PROBATION")
                         .le(HrEmployee::getHireDate, firstDayOfMonth)
                         .and(w -> w.isNull(HrEmployee::getContractEnd)
                                 .or()

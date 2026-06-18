@@ -156,6 +156,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, permission: 'hr:employee:list' },
   },
   {
+    path: '/hr/hire-forms',
+    name: 'hr-hire-forms',
+    component: () => import('@/views/hr/HireForm.vue'),
+    meta: { requiresAuth: true, permission: 'hr:hire-form:list' },
+  },
+  {
     path: '/hr/contract-renewals',
     name: 'hr-contract-renewals',
     component: () => import('@/views/hr/ContractRenewal.vue'),

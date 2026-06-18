@@ -333,7 +333,7 @@ databaseChangeLog:
         - insert:
             tableName: approval_definition
             columns:
-              - column: { name: id, valueNumeric: 9001 }
+              - column: { name: id, valueNumeric: 9101 }
               - column: { name: code, value: CERTIFICATE_APPROVAL }
               - column: { name: name, value: 证明开具审批 }
               - column: { name: business_type, value: CERTIFICATE }

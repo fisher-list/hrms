@@ -205,6 +205,7 @@ databaseChangeLog:
         - insert:
             tableName: approval_definition
             columns:
+              - column: { name: id, valueNumeric: 210 }
               - column: { name: code, value: HR_CONTRACT_RENEWAL }
               - column: { name: name, value: "合同续签审批" }
               - column: { name: business_type, value: HR_CONTRACT_RENEWAL }
@@ -231,6 +232,7 @@ databaseChangeLog:
         - insert:
             tableName: approval_definition
             columns:
+              - column: { name: id, valueNumeric: 211 }
               - column: { name: code, value: HR_PROBATION_CONVERSION }
               - column: { name: name, value: "试用期转正审批" }
               - column: { name: business_type, value: HR_PROBATION_CONVERSION }
@@ -257,6 +259,7 @@ databaseChangeLog:
         - insert:
             tableName: sys_permission
             columns:
+              - column: { name: id, valueNumeric: 1300 }
               - column: { name: code, value: "hr:contract-renewal:list" }
               - column: { name: name, value: "查看合同续签列表" }
               - column: { name: type, value: API }
@@ -267,6 +270,7 @@ databaseChangeLog:
         - insert:
             tableName: sys_permission
             columns:
+              - column: { name: id, valueNumeric: 1301 }
               - column: { name: code, value: "hr:contract-renewal:edit" }
               - column: { name: name, value: "合同续签操作" }
               - column: { name: type, value: API }
@@ -277,6 +281,7 @@ databaseChangeLog:
         - insert:
             tableName: sys_permission
             columns:
+              - column: { name: id, valueNumeric: 1302 }
               - column: { name: code, value: "hr:probation:list" }
               - column: { name: name, value: "查看试用期转正列表" }
               - column: { name: type, value: API }
@@ -287,6 +292,7 @@ databaseChangeLog:
         - insert:
             tableName: sys_permission
             columns:
+              - column: { name: id, valueNumeric: 1303 }
               - column: { name: code, value: "hr:probation:edit" }
               - column: { name: name, value: "试用期转正操作" }
               - column: { name: type, value: API }
@@ -297,6 +303,7 @@ databaseChangeLog:
         - insert:
             tableName: sys_permission
             columns:
+              - column: { name: id, valueNumeric: 1304 }
               - column: { name: code, value: "hr:employee:import" }
               - column: { name: name, value: "批量导入员工" }
               - column: { name: type, value: API }
@@ -307,6 +314,7 @@ databaseChangeLog:
         - insert:
             tableName: sys_permission
             columns:
+              - column: { name: id, valueNumeric: 1305 }
               - column: { name: code, value: "hr:employee:export" }
               - column: { name: name, value: "导出员工花名册" }
               - column: { name: type, value: API }

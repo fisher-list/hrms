@@ -195,9 +195,10 @@ databaseChangeLog:
             indexName: idx_batch_run
             columns:
               - column: { name: run_id }
-        - createUniqueIndex:
+        - createIndex:
             tableName: py_bank_payment_batch
             indexName: uk_batch_no
+            unique: true
             columns:
               - column: { name: batch_no }
       rollback:

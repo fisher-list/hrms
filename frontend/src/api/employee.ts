@@ -186,6 +186,69 @@ export function listProbationConversions(
   });
 }
 
+// ==================== 入职管理 ====================
+
+/** 入职申请创建请求 */
+export interface HireFormCreateReq {
+  employeeSnapshot: string;
+  positionId: number;
+  deptId: number;
+  hireDate: string;
+  accountName: string;
+}
+
+/** 入职申请VO */
+export interface HireFormVo {
+  id: number;
+  formNo: string;
+  employeeSnapshot?: string;
+  positionId?: number;
+  deptId?: number;
+  hireDate?: string;
+  accountName?: string;
+  status: string;
+  approvalInstanceId?: number;
+  createdAt?: string;
+}
+
+/** 创建入职申请 */
+export function createHireForm(data: HireFormCreateReq): Promise<HireFormVo> {
+  return request<HireFormVo>({
+    url: '/hr/hire-forms',
+    method: 'POST',
+    data,
+  });
+}
+
+/** 提交入职申请审批 */
+export function submitHireForm(id: number): Promise<void> {
+  return request<void>({
+    url: `/hr/hire-forms/${id}/submit`,
+    method: 'POST',
+  });
+}
+
+/** 查询入职申请列表 */
+export function listHireForms(
+  status?: string,
+  current = 1,
+  size = 10,
+): Promise<PageVo<HireFormVo>> {
+  return request<PageVo<HireFormVo>>({
+    url: '/hr/hire-forms',
+    method: 'GET',
+    params: { status, current, size },
+  });
+}
+
+/** 获取入职申请详情 */
+export function getHireForm(id: number): Promise<HireFormVo> {
+  return request<HireFormVo>({
+    url: `/hr/hire-forms/${id}`,
+    method: 'GET',
+  });
+}
+
 // ==================== 批量导入导出 ====================
 
 /** 批量导入结果 */
