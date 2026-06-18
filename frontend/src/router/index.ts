@@ -173,6 +173,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/hr/ProbationConversion.vue'),
     meta: { requiresAuth: true, permission: 'hr:probation:list' },
   },
+  {
+    path: '/hr/termination-forms',
+    name: 'hr-termination-forms',
+    component: () => import('@/views/hr/TerminationForm.vue'),
+    meta: { requiresAuth: true, permission: 'hr:termination:list' },
+  },
   // ==================== 绩效 ====================
   {
     path: '/performance/reviews',

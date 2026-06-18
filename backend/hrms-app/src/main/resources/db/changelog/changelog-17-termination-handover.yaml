@@ -1,0 +1,102 @@
+databaseChangeLog:
+  # ============================================================
+  # 17-01 — hr_handover_item table for termination work handover
+  # ============================================================
+  - changeSet:
+      id: 17-01-create-hr-handover-item
+      author: dev-be
+      comment: Handover item for termination work handover management
+      changes:
+        - createTable:
+            tableName: hr_handover_item
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: form_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: category
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: description
+                  type: varchar(500)
+                  constraints: { nullable: false }
+              - column: { name: handover_to, type: varchar(100) }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints: { nullable: false }
+              - column: { name: remark, type: varchar(500) }
+      rollback:
+        - dropTable:
+            tableName: hr_handover_item
+
+  - changeSet:
+      id: 17-02-hr-handover-item-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: hr_handover_item
+            indexName: idx_handover_item_form
+            columns:
+              - column: { name: form_id }
+        - createIndex:
+            tableName: hr_handover_item
+            indexName: idx_handover_item_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropIndex:
+            tableName: hr_handover_item
+            indexName: idx_handover_item_form
+        - dropIndex:
+            tableName: hr_handover_item
+            indexName: idx_handover_item_status
+
+  # ============================================================
+  # 17-03 — seed hr:termination:list permission
+  # ============================================================
+  - changeSet:
+      id: 17-03-seed-termination-permissions
+      author: dev-be
+      comment: Add hr:termination:list permission for termination form frontend route
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: code, value: "hr:termination:list" }
+              - column: { name: name, value: "查看离职申请列表" }
+              - column: { name: module, value: "hr" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "code = 'hr:termination:list'"
