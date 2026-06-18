@@ -10,6 +10,13 @@ import type {
   LeaveRequestCreateReq,
   OvertimeRequestVo,
   OvertimeRequestCreateReq,
+  AttendanceAnomalyVo,
+  AnomalyHandleReq,
+  CompensatoryLeaveVo,
+  CompensatoryLeaveLogVo,
+  OvertimeToCompLeaveReq,
+  BusinessTripVo,
+  BusinessTripCreateReq,
 } from '@/types/attendance';
 
 // ==================== 班次管理 ====================
@@ -127,4 +134,146 @@ export function submitOvertimeRequest(id: number): Promise<void> {
     url: `/attendance/overtime-requests/${id}/submit`,
     method: 'POST',
   });
+}
+
+// ==================== 考勤异常管理 ====================
+/** 检测考勤异常 */
+export function detectAnomalies(startDate: string, endDate: string): Promise<AttendanceAnomalyVo[]> {
+  return request<AttendanceAnomalyVo[]>({
+    url: '/attendance/anomalies/detect',
+    method: 'POST',
+    params: { startDate, endDate },
+  });
+}
+
+/** 查询异常列表 */
+export function listAnomalies(params: {
+  employeeId?: number;
+  startDate?: string;
+  endDate?: string;
+  anomalyType?: string;
+  status?: string;
+  current?: number;
+  size?: number;
+}): Promise<PageVo<AttendanceAnomalyVo>> {
+  return request<PageVo<AttendanceAnomalyVo>>({
+    url: '/attendance/anomalies',
+    method: 'GET',
+    params,
+  });
+}
+
+/** 处理异常记录 */
+export function handleAnomaly(req: AnomalyHandleReq): Promise<void> {
+  return request<void>({
+    url: '/attendance/anomalies/handle',
+    method: 'POST',
+    data: req,
+  });
+}
+
+// ==================== 调休管理 ====================
+/** 加班转调休 */
+export function convertOvertimeToCompLeave(req: OvertimeToCompLeaveReq): Promise<CompensatoryLeaveVo> {
+  return request<CompensatoryLeaveVo>({
+    url: '/attendance/comp-leave/convert',
+    method: 'POST',
+    data: req,
+  });
+}
+
+/** 查询调休余额 */
+export function getCompLeaveBalance(year?: number): Promise<CompensatoryLeaveVo> {
+  return request<CompensatoryLeaveVo>({
+    url: '/attendance/comp-leave/balance',
+    method: 'GET',
+    params: year ? { year } : {},
+  });
+}
+
+/** 查询调休余额历史 */
+export function listCompLeaveBalances(): Promise<CompensatoryLeaveVo[]> {
+  return request<CompensatoryLeaveVo[]>({
+    url: '/attendance/comp-leave/balances',
+    method: 'GET',
+  });
+}
+
+/** 查询调休变动日志 */
+export function listCompLeaveLogs(compLeaveId: number): Promise<CompensatoryLeaveLogVo[]> {
+  return request<CompensatoryLeaveLogVo[]>({
+    url: `/attendance/comp-leave/logs/${compLeaveId}`,
+    method: 'GET',
+  });
+}
+
+// ==================== 出差管理 ====================
+/** 创建出差申请 */
+export function createBusinessTrip(req: BusinessTripCreateReq): Promise<BusinessTripVo> {
+  return request<BusinessTripVo>({
+    url: '/attendance/business-trips',
+    method: 'POST',
+    data: req,
+  });
+}
+
+/** 提交出差审批 */
+export function submitBusinessTrip(id: number): Promise<void> {
+  return request<void>({
+    url: `/attendance/business-trips/${id}/submit`,
+    method: 'POST',
+  });
+}
+
+/** 查询出差申请列表 */
+export function listBusinessTrips(params: {
+  employeeId?: number;
+  status?: string;
+  current?: number;
+  size?: number;
+}): Promise<PageVo<BusinessTripVo>> {
+  return request<PageVo<BusinessTripVo>>({
+    url: '/attendance/business-trips',
+    method: 'GET',
+    params,
+  });
+}
+
+/** 获取出差申请详情 */
+export function getBusinessTrip(id: number): Promise<BusinessTripVo> {
+  return request<BusinessTripVo>({
+    url: `/attendance/business-trips/${id}`,
+    method: 'GET',
+  });
+}
+
+// ==================== 缺勤配额管理 ====================
+/** 查询所有配额规则 */
+export function listLeaveQuotaRules(): Promise<any[]> {
+  return request<any[]>({ url: '/attendance/leave-quota/rules', method: 'GET' });
+}
+
+/** 创建配额规则 */
+export function createLeaveQuotaRule(data: any): Promise<any> {
+  return request<any>({ url: '/attendance/leave-quota/rules', method: 'POST', data });
+}
+
+/** 更新配额规则 */
+export function updateLeaveQuotaRule(id: number, data: any): Promise<any> {
+  return request<any>({ url: `/attendance/leave-quota/rules/${id}`, method: 'PUT', data });
+}
+
+/** 禁用配额规则 */
+export function disableLeaveQuotaRule(id: number): Promise<void> {
+  return request<void>({ url: `/attendance/leave-quota/rules/${id}`, method: 'DELETE' });
+}
+
+/** 为单个员工生成年假配额 */
+export function generateLeaveQuota(data: { employeeId: number; year: number }): Promise<any> {
+  return request<any>({ url: '/attendance/leave-quota/generate', method: 'POST', data });
+}
+
+/** 批量为所有在职员工生成年假配额 */
+export function batchGenerateLeaveQuota(year: number): Promise<any> {
+  return request<any>({ url: '/attendance/leave-quota/generate-batch', method: 'POST', params: { year } });
 }

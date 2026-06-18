@@ -1,0 +1,347 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 15-01 — hr_employee: 新增 insurance_city 字段
+  # ============================================================
+  - changeSet:
+      id: 15-01-add-employee-insurance-city
+      author: dev-be
+      comment: 新增员工参保城市字段（多地区社保政策匹配）
+      changes:
+        - addColumn:
+            tableName: hr_employee
+            columns:
+              - column:
+                  name: insurance_city
+                  type: varchar(50)
+                  remarks: 参保城市，如"北京"、"上海"、"深圳"
+      rollback:
+        - dropColumn:
+            tableName: hr_employee
+            columnName: insurance_city
+
+  # ============================================================
+  # 15-02 — py_region_social_rate（多地区社保公积金比例）
+  # ============================================================
+  - changeSet:
+      id: 15-02-create-py-region-social-rate
+      author: dev-be
+      comment: 多地区社保公积金比例配置表
+      changes:
+        - createTable:
+            tableName: py_region_social_rate
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: city
+                  type: varchar(50)
+                  constraints: { nullable: false }
+                  remarks: 参保城市
+              - column:
+                  name: pension_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.08
+                  remarks: 养老保险个人比例
+              - column:
+                  name: pension_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.16
+                  remarks: 养老保险企业比例
+              - column:
+                  name: medical_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.02
+                  remarks: 医疗保险个人比例
+              - column:
+                  name: medical_fixed_fee
+                  type: "decimal(18,2)"
+                  defaultValueNumeric: 3.00
+                  remarks: 医疗保险固定费用
+              - column:
+                  name: medical_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.098
+                  remarks: 医疗保险企业比例
+              - column:
+                  name: unemployment_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.005
+                  remarks: 失业保险个人比例
+              - column:
+                  name: unemployment_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.005
+                  remarks: 失业保险企业比例
+              - column:
+                  name: injury_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.004
+                  remarks: 工伤保险企业比例
+              - column:
+                  name: maternity_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.008
+                  remarks: 生育保险企业比例
+              - column:
+                  name: housing_fund_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.12
+                  remarks: 住房公积金个人比例
+              - column:
+                  name: housing_fund_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.12
+                  remarks: 住房公积金企业比例
+              - column:
+                  name: social_base_floor
+                  type: "decimal(18,2)"
+                  remarks: 社保基数下限
+              - column:
+                  name: social_base_ceil
+                  type: "decimal(18,2)"
+                  remarks: 社保基数上限
+              - column:
+                  name: fund_base_floor
+                  type: "decimal(18,2)"
+                  remarks: 公积金基数下限
+              - column:
+                  name: fund_base_ceil
+                  type: "decimal(18,2)"
+                  remarks: 公积金基数上限
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints: { nullable: false }
+                  remarks: 是否启用
+      rollback:
+        - dropTable:
+            tableName: py_region_social_rate
+
+  - changeSet:
+      id: 15-03-idx-region-rate-city
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_region_social_rate
+            indexName: idx_region_rate_city
+            columns:
+              - column: { name: city }
+      rollback:
+        - dropIndex:
+            tableName: py_region_social_rate
+            indexName: idx_region_rate_city
+
+  # ============================================================
+  # 15-04 — at_leave_quota_rule（缺勤配额规则）
+  # ============================================================
+  - changeSet:
+      id: 15-04-create-at-leave-quota-rule
+      author: dev-be
+      comment: 年假配额规则表（按司龄/职级自动生成年假天数）
+      changes:
+        - createTable:
+            tableName: at_leave_quota_rule
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints: { nullable: false }
+                  remarks: 规则名称
+              - column:
+                  name: code
+                  type: varchar(50)
+                  constraints: { nullable: false }
+                  remarks: 规则编码
+              - column:
+                  name: leave_type_id
+                  type: bigint
+                  constraints: { nullable: false }
+                  remarks: 假期类型ID
+              - column:
+                  name: seniority_min
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+                  remarks: 司龄下限（含），单位：年
+              - column:
+                  name: seniority_max
+                  type: int
+                  remarks: 司龄上限（不含），null表示无上限
+              - column:
+                  name: grade_min
+                  type: int
+                  remarks: 职级下限（含），null表示不限
+              - column:
+                  name: grade_max
+                  type: int
+                  remarks: 职级上限（不含），null表示不限
+              - column:
+                  name: quota_days
+                  type: "decimal(5,1)"
+                  constraints: { nullable: false }
+                  remarks: 配额天数
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints: { nullable: false }
+              - column:
+                  name: sort_no
+                  type: int
+                  defaultValueNumeric: 0
+                  remarks: 排序号
+      rollback:
+        - dropTable:
+            tableName: at_leave_quota_rule
+
+  - changeSet:
+      id: 15-05-idx-quota-rule-code
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: at_leave_quota_rule
+            indexName: uk_quota_rule_code
+            columns:
+              - column: { name: code }
+            unique: true
+      rollback:
+        - dropIndex:
+            tableName: at_leave_quota_rule
+            indexName: uk_quota_rule_code
+
+  # ============================================================
+  # 15-06 — rc_requisition_publish（职位发布记录）
+  # ============================================================
+  - changeSet:
+      id: 15-06-create-rc-requisition-publish
+      author: dev-be
+      comment: 职位发布记录表（支持一键发布到多个渠道）
+      changes:
+        - createTable:
+            tableName: rc_requisition_publish
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: requisition_id
+                  type: bigint
+                  constraints: { nullable: false }
+                  remarks: 职位需求ID
+              - column:
+                  name: channel
+                  type: varchar(30)
+                  constraints: { nullable: false }
+                  remarks: 发布渠道
+              - column:
+                  name: publish_url
+                  type: varchar(500)
+                  remarks: 发布链接
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints: { nullable: false }
+                  remarks: 发布状态
+              - column:
+                  name: published_at
+                  type: datetime
+                  remarks: 发布时间
+              - column:
+                  name: closed_at
+                  type: datetime
+                  remarks: 关闭时间
+              - column:
+                  name: fail_reason
+                  type: varchar(500)
+                  remarks: 失败原因
+              - column:
+                  name: view_count
+                  type: int
+                  defaultValueNumeric: 0
+                  remarks: 浏览量
+              - column:
+                  name: apply_count
+                  type: int
+                  defaultValueNumeric: 0
+                  remarks: 投递量
+      rollback:
+        - dropTable:
+            tableName: rc_requisition_publish
+
+  - changeSet:
+      id: 15-07-idx-publish-requisition
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: rc_requisition_publish
+            indexName: idx_publish_requisition
+            columns:
+              - column: { name: requisition_id }
+        - createIndex:
+            tableName: rc_requisition_publish
+            indexName: idx_publish_channel
+            columns:
+              - column: { name: channel }
+      rollback:
+        - dropIndex:
+            tableName: rc_requisition_publish
+            indexName: idx_publish_requisition
+        - dropIndex:
+            tableName: rc_requisition_publish
+            indexName: idx_publish_channel

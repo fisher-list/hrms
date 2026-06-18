@@ -90,3 +90,26 @@ export interface ReviewItemReq {
   score: number;
   comment?: string;
 }
+
+// ==================== 职位发布 ====================
+export interface RequisitionPublishVo {
+  id: number;
+  requisitionId: number;
+  channel: string;
+  publishUrl?: string;
+  status: string;
+  publishedAt?: string;
+  closedAt?: string;
+  viewCount?: number;
+  applyCount?: number;
+}
+
+export interface RequisitionPublishReq {
+  requisitionId: number;
+  channels: string[];
+}
+
+export interface ChannelOption {
+  code: string;
+  name: string;
+}

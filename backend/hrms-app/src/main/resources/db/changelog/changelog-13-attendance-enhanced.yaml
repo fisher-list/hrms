@@ -1,0 +1,460 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 13-01 — at_attendance_anomaly (考勤异常记录)
+  # ============================================================
+  - changeSet:
+      id: 13-01-create-at-attendance-anomaly
+      author: dev-be
+      comment: 考勤异常记录表
+      changes:
+        - createTable:
+            tableName: at_attendance_anomaly
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: anomaly_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: anomaly_type
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: duration_minutes
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+              - column:
+                  name: handle_remark
+                  type: varchar(500)
+              - column:
+                  name: schedule_id
+                  type: bigint
+              - column:
+                  name: punch_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: at_attendance_anomaly
+
+  - changeSet:
+      id: 13-02-at-anomaly-indexes
+      author: dev-be
+      comment: 考勤异常记录索引
+      changes:
+        - createIndex:
+            tableName: at_attendance_anomaly
+            indexName: idx_anomaly_employee_date
+            columns:
+              - column: { name: employee_id }
+              - column: { name: anomaly_date }
+        - createIndex:
+            tableName: at_attendance_anomaly
+            indexName: idx_anomaly_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropIndex:
+            tableName: at_attendance_anomaly
+            indexName: idx_anomaly_employee_date
+        - dropIndex:
+            tableName: at_attendance_anomaly
+            indexName: idx_anomaly_status
+
+  # ============================================================
+  # 13-03 — at_compensatory_leave (调休余额)
+  # ============================================================
+  - changeSet:
+      id: 13-03-create-at-compensatory-leave
+      author: dev-be
+      comment: 调休余额表
+      changes:
+        - createTable:
+            tableName: at_compensatory_leave
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: year
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: total_quota
+                  type: "decimal(6,1)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: used
+                  type: "decimal(6,1)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: remaining
+                  type: "decimal(6,1)"
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: at_compensatory_leave
+
+  - changeSet:
+      id: 13-04-at-comp-leave-indexes
+      author: dev-be
+      comment: 调休余额唯一索引
+      changes:
+        - addUniqueConstraint:
+            tableName: at_compensatory_leave
+            columnNames: employee_id, year, tenant_id
+            constraintName: uk_comp_leave_emp_year
+      rollback:
+        - dropUniqueConstraint:
+            tableName: at_compensatory_leave
+            constraintName: uk_comp_leave_emp_year
+
+  # ============================================================
+  # 13-05 — at_compensatory_leave_log (调休变动日志)
+  # ============================================================
+  - changeSet:
+      id: 13-05-create-at-comp-leave-log
+      author: dev-be
+      comment: 调休余额变动日志表
+      changes:
+        - createTable:
+            tableName: at_compensatory_leave_log
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: comp_leave_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: change_type
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: change_value
+                  type: "decimal(6,1)"
+                  constraints: { nullable: false }
+              - column:
+                  name: convert_rate
+                  type: "decimal(4,2)"
+              - column:
+                  name: overtime_request_id
+                  type: bigint
+              - column:
+                  name: leave_request_id
+                  type: bigint
+              - column:
+                  name: remark
+                  type: varchar(500)
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: created_by, type: bigint }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+      rollback:
+        - dropTable:
+            tableName: at_compensatory_leave_log
+
+  - changeSet:
+      id: 13-06-at-comp-leave-log-indexes
+      author: dev-be
+      comment: 调休变动日志索引
+      changes:
+        - createIndex:
+            tableName: at_compensatory_leave_log
+            indexName: idx_comp_log_comp_leave
+            columns:
+              - column: { name: comp_leave_id }
+      rollback:
+        - dropIndex:
+            tableName: at_compensatory_leave_log
+            indexName: idx_comp_log_comp_leave
+
+  # ============================================================
+  # 13-07 — at_business_trip (出差申请单)
+  # ============================================================
+  - changeSet:
+      id: 13-07-create-at-business-trip
+      author: dev-be
+      comment: 出差申请单表
+      changes:
+        - createTable:
+            tableName: at_business_trip
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: destination
+                  type: varchar(200)
+                  constraints: { nullable: false }
+              - column:
+                  name: reason
+                  type: varchar(1000)
+                  constraints: { nullable: false }
+              - column:
+                  name: start_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: end_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: days
+                  type: "decimal(4,1)"
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+              - column:
+                  name: approval_instance_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: at_business_trip
+
+  - changeSet:
+      id: 13-08-at-business-trip-indexes
+      author: dev-be
+      comment: 出差申请单索引
+      changes:
+        - createIndex:
+            tableName: at_business_trip
+            indexName: idx_trip_employee_status
+            columns:
+              - column: { name: employee_id }
+              - column: { name: status }
+        - createIndex:
+            tableName: at_business_trip
+            indexName: idx_trip_dates
+            columns:
+              - column: { name: employee_id }
+              - column: { name: start_date }
+              - column: { name: end_date }
+      rollback:
+        - dropIndex:
+            tableName: at_business_trip
+            indexName: idx_trip_employee_status
+        - dropIndex:
+            tableName: at_business_trip
+            indexName: idx_trip_dates
+
+  # ============================================================
+  # 13-09 — 权限种子数据
+  # ============================================================
+  - changeSet:
+      id: 13-09-seed-enhanced-attendance-permissions
+      author: dev-be
+      comment: 考勤增强模块权限
+      context: seed
+      changes:
+        # 考勤异常权限
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 510 }
+              - column: { name: code, value: "at:anomaly:list" }
+              - column: { name: name, value: "查看考勤异常" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 511 }
+              - column: { name: code, value: "at:anomaly:detect" }
+              - column: { name: name, value: "检测考勤异常" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 512 }
+              - column: { name: code, value: "at:anomaly:handle" }
+              - column: { name: name, value: "处理考勤异常" }
+              - column: { name: type, value: "button" }
+        # 调休管理权限
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 513 }
+              - column: { name: code, value: "at:comp:list" }
+              - column: { name: name, value: "查看调休余额" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 514 }
+              - column: { name: code, value: "at:comp:convert" }
+              - column: { name: name, value: "加班转调休" }
+              - column: { name: type, value: "button" }
+        # 出差管理权限
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 515 }
+              - column: { name: code, value: "at:trip:list" }
+              - column: { name: name, value: "查看出差申请" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 516 }
+              - column: { name: code, value: "at:trip:submit" }
+              - column: { name: name, value: "提交出差申请" }
+              - column: { name: type, value: "button" }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 510 AND 516"
+
+  # ============================================================
+  # 13-10 — 权限映射到ADMIN角色
+  # ============================================================
+  - changeSet:
+      id: 13-10-seed-admin-enhanced-at-permissions
+      author: dev-be
+      comment: 考勤增强权限映射到ADMIN
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90020 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 510 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90021 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 511 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90022 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 512 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90023 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 513 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90024 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 514 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90025 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 515 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90026 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 516 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 510 AND 516"

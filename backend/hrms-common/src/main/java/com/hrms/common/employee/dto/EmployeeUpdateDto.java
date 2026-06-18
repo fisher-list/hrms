@@ -39,6 +39,9 @@ public class EmployeeUpdateDto {
 
     private String emergencyPhone;
 
+    /** 参保城市（用于匹配地区社保政策） */
+    private String insuranceCity;
+
     private List<EmployeeCreateDto.EducationDto> educations;
 
     private List<EmployeeCreateDto.WorkExpDto> workExps;

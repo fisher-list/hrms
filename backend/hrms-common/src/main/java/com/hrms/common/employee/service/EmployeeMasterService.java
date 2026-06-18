@@ -190,6 +190,7 @@ public class EmployeeMasterService {
         emp.setProbationEnd(dto.getProbationEnd());
         emp.setEmergencyContact(dto.getEmergencyContact());
         emp.setEmergencyPhoneEnc(AesUtil.encrypt(dto.getEmergencyPhone()));
+        emp.setInsuranceCity(dto.getInsuranceCity());
 
         employeeMapper.insert(emp);
         emp.setEmpNo(String.format("E%06d", emp.getId()));
@@ -236,6 +237,7 @@ public class EmployeeMasterService {
         if (dto.getProbationEnd() != null) emp.setProbationEnd(dto.getProbationEnd());
         if (dto.getEmergencyContact() != null) emp.setEmergencyContact(dto.getEmergencyContact());
         if (dto.getEmergencyPhone() != null) emp.setEmergencyPhoneEnc(AesUtil.encrypt(dto.getEmergencyPhone()));
+        if (dto.getInsuranceCity() != null) emp.setInsuranceCity(dto.getInsuranceCity());
 
         employeeMapper.updateById(emp);
 

@@ -97,3 +97,45 @@ export interface CompensationCreateReq {
   allowance?: number;
   effectiveDate: string;
 }
+
+// ==================== 多地区社保 ====================
+export interface RegionSocialRateVo {
+  id: number;
+  city: string;
+  pensionPersonal: number;
+  pensionCompany: number;
+  medicalPersonal: number;
+  medicalFixedFee: number;
+  medicalCompany: number;
+  unemploymentPersonal: number;
+  unemploymentCompany: number;
+  injuryCompany?: number;
+  maternityCompany?: number;
+  housingFundPersonal: number;
+  housingFundCompany: number;
+  socialBaseFloor?: number;
+  socialBaseCeil?: number;
+  fundBaseFloor?: number;
+  fundBaseCeil?: number;
+  enabled: boolean;
+}
+
+// ==================== 缺勤配额规则 ====================
+export interface LeaveQuotaRuleVo {
+  id: number;
+  name: string;
+  code: string;
+  leaveTypeId: number;
+  seniorityMin: number;
+  seniorityMax?: number;
+  gradeMin?: number;
+  gradeMax?: number;
+  quotaDays: number;
+  enabled: boolean;
+  sortNo: number;
+}
+
+export interface LeaveQuotaGenerateReq {
+  employeeId?: number;
+  year: number;
+}

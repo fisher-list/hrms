@@ -1,0 +1,70 @@
+databaseChangeLog:
+  # ============================================================
+  # 16-01 — HR报表模块权限种子数据
+  # ============================================================
+  - changeSet:
+      id: 16-01-seed-report-permissions
+      author: hrms
+      comment: Insert HR report permissions and assign to ADMIN role
+      context: seed
+      changes:
+        # HR仪表盘权限
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 9001 }
+              - column: { name: code, value: "hr:dashboard:view" }
+              - column: { name: name, value: "查看HR仪表盘" }
+              - column: { name: type, value: "button" }
+        # 人事花名册权限
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 9002 }
+              - column: { name: code, value: "hr:roster:view" }
+              - column: { name: name, value: "查看人事花名册" }
+              - column: { name: type, value: "button" }
+        # 考勤月报权限
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 9003 }
+              - column: { name: code, value: "at:report:view" }
+              - column: { name: name, value: "查看考勤月报" }
+              - column: { name: type, value: "button" }
+        # 薪资报表权限
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 9004 }
+              - column: { name: code, value: "py:report:view" }
+              - column: { name: name, value: "查看薪资报表" }
+              - column: { name: type, value: "button" }
+        # 给ADMIN角色授权报表权限
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 9001 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 9002 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 9003 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 9004 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: permission_id IN (9001, 9002, 9003, 9004)
+        - delete:
+            tableName: sys_permission
+            where: id IN (9001, 9002, 9003, 9004)

@@ -98,3 +98,29 @@ export function listMyPayslips(): Promise<PayrollDetailVo[]> {
 export function getMyPayslip(runId: number): Promise<PayrollDetailVo> {
   return request<PayrollDetailVo>({ url: `/payroll/payslips/${runId}`, method: 'GET' });
 }
+
+// ==================== 多地区社保政策 ====================
+/** 查询所有启用的地区社保政策 */
+export function listRegionSocialRates(): Promise<any[]> {
+  return request<any[]>({ url: '/payroll/region-social-rates', method: 'GET' });
+}
+
+/** 根据城市查询社保政策 */
+export function getRegionSocialRateByCity(city: string): Promise<any> {
+  return request<any>({ url: `/payroll/region-social-rates/city/${city}`, method: 'GET' });
+}
+
+/** 创建地区社保政策 */
+export function createRegionSocialRate(data: any): Promise<any> {
+  return request<any>({ url: '/payroll/region-social-rates', method: 'POST', data });
+}
+
+/** 更新地区社保政策 */
+export function updateRegionSocialRate(id: number, data: any): Promise<any> {
+  return request<any>({ url: `/payroll/region-social-rates/${id}`, method: 'PUT', data });
+}
+
+/** 禁用地区社保政策 */
+export function disableRegionSocialRate(id: number): Promise<void> {
+  return request<void>({ url: `/payroll/region-social-rates/${id}`, method: 'DELETE' });
+}

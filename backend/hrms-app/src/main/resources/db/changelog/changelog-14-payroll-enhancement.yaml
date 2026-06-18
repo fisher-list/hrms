@@ -1,0 +1,488 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 13-01 — py_year_end_bonus 年终奖表
+  # ============================================================
+  - changeSet:
+      id: 13-01-create-py-year-end-bonus
+      author: dev-be
+      comment: 年终奖表
+      changes:
+        - createTable:
+            tableName: py_year_end_bonus
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_name
+                  type: varchar(50)
+              - column:
+                  name: emp_no
+                  type: varchar(20)
+              - column:
+                  name: bonus_year
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: base_salary
+                  type: "decimal(18,4)"
+              - column:
+                  name: bonus_months
+                  type: "decimal(5,2)"
+                  defaultValueNumeric: 1
+              - column:
+                  name: attendance_coefficient
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 1
+              - column:
+                  name: bonus_amount
+                  type: "decimal(18,4)"
+              - column:
+                  name: tax_method
+                  type: varchar(20)
+              - column:
+                  name: tax_amount
+                  type: "decimal(18,4)"
+              - column:
+                  name: net_amount
+                  type: "decimal(18,4)"
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: DRAFT
+      rollback:
+        - dropTable:
+            tableName: py_year_end_bonus
+
+  - changeSet:
+      id: 13-02-py-year-end-bonus-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_year_end_bonus
+            indexName: idx_bonus_emp
+            columns:
+              - column: { name: employee_id }
+        - createIndex:
+            tableName: py_year_end_bonus
+            indexName: idx_bonus_year
+            columns:
+              - column: { name: bonus_year }
+      rollback:
+        - dropIndex:
+            tableName: py_year_end_bonus
+            indexName: idx_bonus_emp
+        - dropIndex:
+            tableName: py_year_end_bonus
+            indexName: idx_bonus_year
+
+  # ============================================================
+  # 13-03 — py_bank_payment_batch 银行代发批次表
+  # ============================================================
+  - changeSet:
+      id: 13-03-create-py-bank-payment-batch
+      author: dev-be
+      comment: 银行代发批次表
+      changes:
+        - createTable:
+            tableName: py_bank_payment_batch
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: run_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: batch_no
+                  type: varchar(30)
+                  constraints: { nullable: false }
+              - column:
+                  name: bank_type
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: payer_account_name
+                  type: varchar(100)
+              - column:
+                  name: payer_account_no
+                  type: varchar(50)
+              - column:
+                  name: payer_bank_name
+                  type: varchar(100)
+              - column:
+                  name: employee_count
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_amount
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: GENERATED
+              - column:
+                  name: file_path
+                  type: varchar(500)
+              - column:
+                  name: remark
+                  type: varchar(500)
+      rollback:
+        - dropTable:
+            tableName: py_bank_payment_batch
+
+  - changeSet:
+      id: 13-04-py-bank-payment-batch-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_bank_payment_batch
+            indexName: idx_batch_run
+            columns:
+              - column: { name: run_id }
+        - createUniqueIndex:
+            tableName: py_bank_payment_batch
+            indexName: uk_batch_no
+            columns:
+              - column: { name: batch_no }
+      rollback:
+        - dropIndex:
+            tableName: py_bank_payment_batch
+            indexName: idx_batch_run
+        - dropIndex:
+            tableName: py_bank_payment_batch
+            indexName: uk_batch_no
+
+  # ============================================================
+  # 13-05 — py_bank_payment_detail 银行代发明细表
+  # ============================================================
+  - changeSet:
+      id: 13-05-create-py-bank-payment-detail
+      author: dev-be
+      comment: 银行代发明细表
+      changes:
+        - createTable:
+            tableName: py_bank_payment_detail
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: batch_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_name
+                  type: varchar(50)
+              - column:
+                  name: emp_no
+                  type: varchar(20)
+              - column:
+                  name: bank_name
+                  type: varchar(100)
+              - column:
+                  name: account_no
+                  type: varchar(50)
+              - column:
+                  name: account_name
+                  type: varchar(50)
+              - column:
+                  name: amount
+                  type: "decimal(18,4)"
+              - column:
+                  name: purpose
+                  type: varchar(100)
+      rollback:
+        - dropTable:
+            tableName: py_bank_payment_detail
+
+  - changeSet:
+      id: 13-06-py-bank-payment-detail-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_bank_payment_detail
+            indexName: idx_payment_detail_batch
+            columns:
+              - column: { name: batch_id }
+        - createIndex:
+            tableName: py_bank_payment_detail
+            indexName: idx_payment_detail_emp
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: py_bank_payment_detail
+            indexName: idx_payment_detail_batch
+        - dropIndex:
+            tableName: py_bank_payment_detail
+            indexName: idx_payment_detail_emp
+
+  # ============================================================
+  # 13-07 — py_payroll_simulation 工资模拟运行表
+  # ============================================================
+  - changeSet:
+      id: 13-07-create-py-payroll-simulation
+      author: dev-be
+      comment: 工资模拟运行表
+      changes:
+        - createTable:
+            tableName: py_payroll_simulation
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: period_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: DRAFT
+              - column:
+                  name: social_insurance_rate_override
+                  type: varchar(200)
+              - column:
+                  name: housing_fund_rate_override
+                  type: varchar(200)
+              - column:
+                  name: employee_count
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_gross
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_net
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: compared
+                  type: boolean
+                  defaultValueBoolean: false
+      rollback:
+        - dropTable:
+            tableName: py_payroll_simulation
+
+  - changeSet:
+      id: 13-08-py-payroll-simulation-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_payroll_simulation
+            indexName: idx_simulation_period
+            columns:
+              - column: { name: period_id }
+      rollback:
+        - dropIndex:
+            tableName: py_payroll_simulation
+            indexName: idx_simulation_period
+
+  # ============================================================
+  # 13-09 — py_simulation_detail 工资模拟明细表
+  # ============================================================
+  - changeSet:
+      id: 13-09-create-py-simulation-detail
+      author: dev-be
+      comment: 工资模拟明细表
+      changes:
+        - createTable:
+            tableName: py_simulation_detail
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: simulation_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_name
+                  type: varchar(50)
+              - column:
+                  name: emp_no
+                  type: varchar(20)
+              - column:
+                  name: gross_pay
+                  type: "decimal(18,4)"
+              - column:
+                  name: social_insurance
+                  type: "decimal(18,4)"
+              - column:
+                  name: housing_fund
+                  type: "decimal(18,4)"
+              - column:
+                  name: iit
+                  type: "decimal(18,4)"
+              - column:
+                  name: net_pay
+                  type: "decimal(18,4)"
+              - column:
+                  name: diff_net_pay
+                  type: "decimal(18,4)"
+      rollback:
+        - dropTable:
+            tableName: py_simulation_detail
+
+  - changeSet:
+      id: 13-10-py-simulation-detail-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_simulation_detail
+            indexName: idx_sim_detail_simulation
+            columns:
+              - column: { name: simulation_id }
+        - createIndex:
+            tableName: py_simulation_detail
+            indexName: idx_sim_detail_emp
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: py_simulation_detail
+            indexName: idx_sim_detail_simulation
+        - dropIndex:
+            tableName: py_simulation_detail
+            indexName: idx_sim_detail_emp

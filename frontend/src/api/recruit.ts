@@ -55,3 +55,20 @@ export function getRequisition(id: number): Promise<RequisitionVo> {
 export function createRequisition(req: RequisitionCreateReq): Promise<RequisitionVo> {
   return request<RequisitionVo>({ url: '/recruit/requisitions', method: 'POST', data: req });
 }
+
+// ==================== 职位发布 ====================
+export function publishRequisition(req: { requisitionId: number; channels: string[] }): Promise<any[]> {
+  return request<any[]>({ url: '/recruit/requisitions/publish', method: 'POST', data: req });
+}
+
+export function listPublishes(requisitionId: number): Promise<any[]> {
+  return request<any[]>({ url: `/recruit/requisitions/${requisitionId}/publishes`, method: 'GET' });
+}
+
+export function closePublish(publishId: number): Promise<void> {
+  return request<void>({ url: `/recruit/requisitions/publishes/${publishId}/close`, method: 'POST' });
+}
+
+export function getPublishChannels(): Promise<{ code: string; name: string }[]> {
+  return request<{ code: string; name: string }[]>({ url: '/recruit/requisitions/publish-channels', method: 'GET' });
+}

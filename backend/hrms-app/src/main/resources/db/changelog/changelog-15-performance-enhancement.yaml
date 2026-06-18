@@ -1,0 +1,348 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 15-01 — pf_goal_plan（绩效目标分解计划表）
+  # ============================================================
+  - changeSet:
+      id: 15-01-create-pf-goal-plan
+      author: dev-be
+      comment: 绩效目标分解计划表，支持组织→部门→个人层层分解
+      changes:
+        - createTable:
+            tableName: pf_goal_plan
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: cycle_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: parent_id, type: bigint }
+              - column:
+                  name: goal_level
+                  type: varchar(10)
+                  constraints: { nullable: false }
+              - column:
+                  name: owner_type
+                  type: varchar(10)
+                  constraints: { nullable: false }
+              - column:
+                  name: owner_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: title
+                  type: varchar(200)
+                  constraints: { nullable: false }
+              - column: { name: description, type: text }
+              - column:
+                  name: weight
+                  type: int
+                  constraints: { nullable: false }
+              - column: { name: target_value, type: "decimal(12,2)" }
+              - column: { name: actual_value, type: "decimal(12,2)" }
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column:
+                  name: sort_order
+                  type: int
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: pf_goal_plan
+
+  - changeSet:
+      id: 15-02-pf-goal-plan-indexes
+      author: dev-be
+      comment: 绩效目标分解计划索引
+      changes:
+        - createIndex:
+            tableName: pf_goal_plan
+            indexName: idx_goal_plan_cycle
+            columns:
+              - column: { name: cycle_id }
+        - createIndex:
+            tableName: pf_goal_plan
+            indexName: idx_goal_plan_parent
+            columns:
+              - column: { name: parent_id }
+        - createIndex:
+            tableName: pf_goal_plan
+            indexName: idx_goal_plan_owner
+            columns:
+              - column: { name: owner_type }
+              - column: { name: owner_id }
+      rollback:
+        - dropIndex:
+            tableName: pf_goal_plan
+            indexName: idx_goal_plan_cycle
+        - dropIndex:
+            tableName: pf_goal_plan
+            indexName: idx_goal_plan_parent
+        - dropIndex:
+            tableName: pf_goal_plan
+            indexName: idx_goal_plan_owner
+
+  # ============================================================
+  # 15-03 — pf_salary_adjustment（绩效联动薪酬调整建议表）
+  # ============================================================
+  - changeSet:
+      id: 15-03-create-pf-salary-adjustment
+      author: dev-be
+      comment: 绩效联动薪酬调整建议表
+      changes:
+        - createTable:
+            tableName: pf_salary_adjustment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: appraisal_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: cycle_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: grade
+                  type: varchar(2)
+                  constraints: { nullable: false }
+              - column:
+                  name: final_score
+                  type: "decimal(5,2)"
+                  constraints: { nullable: false }
+              - column:
+                  name: current_base_salary
+                  type: "decimal(12,2)"
+                  constraints: { nullable: false }
+              - column:
+                  name: adjustment_pct
+                  type: "decimal(6,2)"
+                  constraints: { nullable: false }
+              - column:
+                  name: suggested_salary
+                  type: "decimal(12,2)"
+                  constraints: { nullable: false }
+              - column: { name: effective_date, type: date }
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: PENDING
+                  constraints: { nullable: false }
+              - column: { name: remark, type: text }
+      rollback:
+        - dropTable:
+            tableName: pf_salary_adjustment
+
+  - changeSet:
+      id: 15-04-pf-salary-adjustment-indexes
+      author: dev-be
+      comment: 薪酬调整建议索引
+      changes:
+        - createIndex:
+            tableName: pf_salary_adjustment
+            indexName: idx_salary_adj_emp
+            columns:
+              - column: { name: employee_id }
+        - createIndex:
+            tableName: pf_salary_adjustment
+            indexName: idx_salary_adj_appraisal
+            columns:
+              - column: { name: appraisal_id }
+        - addUniqueConstraint:
+            tableName: pf_salary_adjustment
+            columnNames: appraisal_id, tenant_id
+            constraintName: uk_salary_adj_appraisal
+      rollback:
+        - dropIndex:
+            tableName: pf_salary_adjustment
+            indexName: idx_salary_adj_emp
+        - dropIndex:
+            tableName: pf_salary_adjustment
+            indexName: idx_salary_adj_appraisal
+        - dropUniqueConstraint:
+            tableName: pf_salary_adjustment
+            constraintName: uk_salary_adj_appraisal
+
+  # ============================================================
+  # 15-05 — hr_certificate（员工证明开具表）
+  # ============================================================
+  - changeSet:
+      id: 15-05-create-hr-certificate
+      author: dev-be
+      comment: 员工证明开具申请表（在职证明/收入证明）
+      changes:
+        - createTable:
+            tableName: hr_certificate
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # 业务字段
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: type
+                  type: varchar(15)
+                  constraints: { nullable: false }
+              - column:
+                  name: purpose
+                  type: varchar(500)
+                  constraints: { nullable: false }
+              - column:
+                  name: copies
+                  type: int
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column: { name: approval_instance_id, type: bigint }
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: PENDING
+                  constraints: { nullable: false }
+              - column: { name: issued_at, type: datetime }
+              - column: { name: income_start_date, type: date }
+              - column: { name: income_end_date, type: date }
+              - column: { name: reject_reason, type: text }
+      rollback:
+        - dropTable:
+            tableName: hr_certificate
+
+  - changeSet:
+      id: 15-06-hr-certificate-indexes
+      author: dev-be
+      comment: 证明开具索引
+      changes:
+        - createIndex:
+            tableName: hr_certificate
+            indexName: idx_certificate_emp
+            columns:
+              - column: { name: employee_id }
+        - createIndex:
+            tableName: hr_certificate
+            indexName: idx_certificate_status
+            columns:
+              - column: { name: status }
+        - createIndex:
+            tableName: hr_certificate
+            indexName: idx_certificate_approval
+            columns:
+              - column: { name: approval_instance_id }
+      rollback:
+        - dropIndex:
+            tableName: hr_certificate
+            indexName: idx_certificate_emp
+        - dropIndex:
+            tableName: hr_certificate
+            indexName: idx_certificate_status
+        - dropIndex:
+            tableName: hr_certificate
+            indexName: idx_certificate_approval
+
+  # ============================================================
+  # 15-07 — 审批定义（证明开具审批流程）
+  # ============================================================
+  - changeSet:
+      id: 15-07-insert-certificate-approval-def
+      author: dev-be
+      comment: 添加证明开具审批流程定义
+      changes:
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 9001 }
+              - column: { name: code, value: CERTIFICATE_APPROVAL }
+              - column: { name: name, value: 证明开具审批 }
+              - column: { name: business_type, value: CERTIFICATE }
+              - column: { name: nodes, value: '[{"seq":1,"name":"部门主管审批","approverRule":"EMP_MANAGER"}]' }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: approval_definition
+            where: code = 'CERTIFICATE_APPROVAL'

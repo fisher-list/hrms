@@ -55,4 +55,7 @@ public class HrEmployee extends BaseEntity {
 
     /** AES-encrypted emergency phone (base64). */
     private String emergencyPhoneEnc;
+
+    /** 参保城市（用于多地区社保政策匹配），如 "北京"、"上海"、"深圳" */
+    private String insuranceCity;
 }

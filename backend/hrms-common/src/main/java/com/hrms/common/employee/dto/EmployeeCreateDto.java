@@ -47,6 +47,9 @@ public class EmployeeCreateDto {
 
     private String emergencyPhone;
 
+    /** 参保城市（用于匹配地区社保政策） */
+    private String insuranceCity;
+
     @Valid
     private List<EducationDto> educations;
 

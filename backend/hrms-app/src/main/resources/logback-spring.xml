@@ -8,7 +8,7 @@
 
   Environment overrides:
     LOG_LEVEL         – root log level (default INFO)
-    LOG_FILE_PATH     – log file directory (default /var/log/hrms)
+    LOG_FILE_PATH     – log file directory (default ${user.home}/hrms/logs)
     LOG_FILE_MAX_SIZE – max file size before rolling (default 100MB)
     LOG_FILE_MAX_HISTORY – days to keep rolled files (default 30)
 -->
@@ -16,7 +16,7 @@
 
     <!-- ────────────── properties ────────────── -->
     <property name="APP_NAME" value="hrms"/>
-    <property name="LOG_FILE_PATH"   value="${LOG_FILE_PATH:-/var/log/hrms}"/>
+    <property name="LOG_FILE_PATH"   value="${LOG_FILE_PATH:-${user.home}/hrms/logs}"/>
     <property name="LOG_FILE_MAX_SIZE"    value="${LOG_FILE_MAX_SIZE:-100MB}"/>
     <property name="LOG_FILE_MAX_HISTORY" value="${LOG_FILE_MAX_HISTORY:-30}"/>
     <property name="LOG_LEVEL_ROOT"  value="${LOG_LEVEL:-INFO}"/>

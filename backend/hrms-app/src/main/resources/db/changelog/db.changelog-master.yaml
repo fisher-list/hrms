@@ -38,3 +38,21 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelog-12-audit-log.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changelog-13-hr-enhancement.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changelog-13-attendance-enhanced.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changelog-14-payroll-enhancement.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changelog-15-performance-enhancement.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changelog-15-enhancement-batch2.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changelog-16-report-permissions.yaml
+      relativeToChangelogFile: false

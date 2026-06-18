@@ -1,0 +1,340 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 13-01 — 合同续签申请表
+  # ============================================================
+  - changeSet:
+      id: 13-01-create-hr-contract-renewal
+      author: dev-be
+      comment: 合同续签申请单
+      changes:
+        - createTable:
+            tableName: hr_contract_renewal
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: original_contract_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: renewal_no
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column:
+                  name: new_contract_type
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: new_start_date
+                  type: date
+                  constraints: { nullable: false }
+              - column: { name: new_end_date, type: date }
+              - column: { name: remark, type: text }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints: { nullable: false }
+              - column: { name: approval_instance_id, type: bigint }
+      rollback:
+        - dropTable:
+            tableName: hr_contract_renewal
+
+  - changeSet:
+      id: 13-02-hr-contract-renewal-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: hr_contract_renewal
+            columnNames: renewal_no
+            constraintName: uk_contract_renewal_no
+        - createIndex:
+            tableName: hr_contract_renewal
+            indexName: idx_contract_renewal_employee
+            columns:
+              - column: { name: employee_id }
+        - createIndex:
+            tableName: hr_contract_renewal
+            indexName: idx_contract_renewal_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropUniqueConstraint:
+            tableName: hr_contract_renewal
+            constraintName: uk_contract_renewal_no
+        - dropIndex:
+            tableName: hr_contract_renewal
+            indexName: idx_contract_renewal_employee
+        - dropIndex:
+            tableName: hr_contract_renewal
+            indexName: idx_contract_renewal_status
+
+  # ============================================================
+  # 13-03 — 试用期转正申请表
+  # ============================================================
+  - changeSet:
+      id: 13-03-create-hr-probation-conversion
+      author: dev-be
+      comment: 试用期转正申请单
+      changes:
+        - createTable:
+            tableName: hr_probation_conversion
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: conversion_no
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column:
+                  name: probation_start_date
+                  type: date
+              - column:
+                  name: probation_end_date
+                  type: date
+              - column:
+                  name: planned_conversion_date
+                  type: date
+              - column: { name: evaluation_remark, type: text }
+              - column: { name: manager_comment, type: text }
+              - column: { name: evaluation_score, type: int }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints: { nullable: false }
+              - column: { name: approval_instance_id, type: bigint }
+      rollback:
+        - dropTable:
+            tableName: hr_probation_conversion
+
+  - changeSet:
+      id: 13-04-hr-probation-conversion-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: hr_probation_conversion
+            columnNames: conversion_no
+            constraintName: uk_probation_conversion_no
+        - createIndex:
+            tableName: hr_probation_conversion
+            indexName: idx_probation_conversion_employee
+            columns:
+              - column: { name: employee_id }
+        - createIndex:
+            tableName: hr_probation_conversion
+            indexName: idx_probation_conversion_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropUniqueConstraint:
+            tableName: hr_probation_conversion
+            constraintName: uk_probation_conversion_no
+        - dropIndex:
+            tableName: hr_probation_conversion
+            indexName: idx_probation_conversion_employee
+        - dropIndex:
+            tableName: hr_probation_conversion
+            indexName: idx_probation_conversion_status
+
+  # ============================================================
+  # 13-05 — 审批定义：合同续签
+  # ============================================================
+  - changeSet:
+      id: 13-05-seed-contract-renewal-approval-def
+      author: dev-be
+      comment: 合同续签审批定义（2节点：直属经理->HR）
+      changes:
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: code, value: HR_CONTRACT_RENEWAL }
+              - column: { name: name, value: "合同续签审批" }
+              - column: { name: business_type, value: HR_CONTRACT_RENEWAL }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"直属经理","approverRule":"EMP_MANAGER"},{"seq":2,"name":"HR审核","approverRule":"ROLE:HR_MANAGER"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: approval_definition
+            where: code = 'HR_CONTRACT_RENEWAL'
+
+  # ============================================================
+  # 13-06 — 审批定义：试用期转正
+  # ============================================================
+  - changeSet:
+      id: 13-06-seed-probation-conversion-approval-def
+      author: dev-be
+      comment: 试用期转正审批定义（2节点：直属经理->HR）
+      changes:
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: code, value: HR_PROBATION_CONVERSION }
+              - column: { name: name, value: "试用期转正审批" }
+              - column: { name: business_type, value: HR_PROBATION_CONVERSION }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"直属经理","approverRule":"EMP_MANAGER"},{"seq":2,"name":"HR审核","approverRule":"ROLE:HR_MANAGER"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: approval_definition
+            where: code = 'HR_PROBATION_CONVERSION'
+
+  # ============================================================
+  # 13-07 — 新增权限：合同续签、试用期转正、批量导入导出
+  # ============================================================
+  - changeSet:
+      id: 13-07-seed-hr-enhancement-permissions
+      author: dev-be
+      comment: 合同续签、试用期转正、批量导入导出权限
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: code, value: "hr:contract-renewal:list" }
+              - column: { name: name, value: "查看合同续签列表" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 130 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: code, value: "hr:contract-renewal:edit" }
+              - column: { name: name, value: "合同续签操作" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 131 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: code, value: "hr:probation:list" }
+              - column: { name: name, value: "查看试用期转正列表" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 132 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: code, value: "hr:probation:edit" }
+              - column: { name: name, value: "试用期转正操作" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 133 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: code, value: "hr:employee:import" }
+              - column: { name: name, value: "批量导入员工" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 134 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: code, value: "hr:employee:export" }
+              - column: { name: name, value: "导出员工花名册" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 135 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - sql:
+            sql: "DELETE FROM sys_permission WHERE code IN ('hr:contract-renewal:list','hr:contract-renewal:edit','hr:probation:list','hr:probation:edit','hr:employee:import','hr:employee:export')"
+
+  # ============================================================
+  # 13-08 — 将新权限分配给角色
+  # ============================================================
+  - changeSet:
+      id: 13-08-seed-hr-enhancement-role-permission
+      author: dev-be
+      comment: 将新权限分配给ADMIN和HR_MANAGER角色
+      changes:
+        # ADMIN gets all new permissions
+        - sql:
+            sql: "INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id) SELECT id + 70000, 100, id, false, 0, 1 FROM sys_permission WHERE deleted = false AND code IN ('hr:contract-renewal:list','hr:contract-renewal:edit','hr:probation:list','hr:probation:edit','hr:employee:import','hr:employee:export')"
+        # HR_MANAGER gets all new permissions
+        - sql:
+            sql: "INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id) SELECT id + 71000, 101, id, false, 0, 1 FROM sys_permission WHERE deleted = false AND code IN ('hr:contract-renewal:list','hr:contract-renewal:edit','hr:probation:list','hr:probation:edit','hr:employee:import','hr:employee:export')"
+        # LINE_MANAGER gets list permissions
+        - sql:
+            sql: "INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id) SELECT id + 72000, 102, id, false, 0, 1 FROM sys_permission WHERE deleted = false AND code IN ('hr:contract-renewal:list','hr:probation:list')"
+      rollback:
+        - sql:
+            sql: "DELETE FROM sys_role_permission WHERE permission_id IN (SELECT id FROM sys_permission WHERE code IN ('hr:contract-renewal:list','hr:contract-renewal:edit','hr:probation:list','hr:probation:edit','hr:employee:import','hr:employee:export'))"

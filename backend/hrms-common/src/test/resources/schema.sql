@@ -338,6 +338,231 @@ CREATE TABLE IF NOT EXISTS hr_employee_address (
     detail      VARCHAR(255)
 );
 
+-- py_payroll_period (薪酬期间)
+CREATE TABLE IF NOT EXISTS py_payroll_period (
+    id              BIGINT       NOT NULL PRIMARY KEY,
+    created_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP,
+    created_by      BIGINT,
+    updated_by      BIGINT,
+    deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+    version         INT          NOT NULL DEFAULT 0,
+    tenant_id       BIGINT       NOT NULL DEFAULT 1,
+    period_month    VARCHAR(7)   NOT NULL,
+    status          VARCHAR(10)  DEFAULT 'DRAFT'
+);
+
+-- py_payroll_run (薪酬运行)
+CREATE TABLE IF NOT EXISTS py_payroll_run (
+    id                BIGINT       NOT NULL PRIMARY KEY,
+    created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP,
+    created_by        BIGINT,
+    updated_by        BIGINT,
+    deleted           BOOLEAN      NOT NULL DEFAULT FALSE,
+    version           INT          NOT NULL DEFAULT 0,
+    tenant_id         BIGINT       NOT NULL DEFAULT 1,
+    period_id         BIGINT       NOT NULL,
+    run_type          VARCHAR(10)  DEFAULT 'NORMAL',
+    status            VARCHAR(15)  DEFAULT 'DRAFT',
+    reverse_of_run_id BIGINT,
+    employee_count    INT          DEFAULT 0,
+    total_gross       DECIMAL(18,4) DEFAULT 0,
+    total_net         DECIMAL(18,4) DEFAULT 0
+);
+
+-- py_payroll_detail (薪酬明细)
+CREATE TABLE IF NOT EXISTS py_payroll_detail (
+    id                BIGINT       NOT NULL PRIMARY KEY,
+    created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP,
+    created_by        BIGINT,
+    updated_by        BIGINT,
+    deleted           BOOLEAN      NOT NULL DEFAULT FALSE,
+    version           INT          NOT NULL DEFAULT 0,
+    tenant_id         BIGINT       NOT NULL DEFAULT 1,
+    run_id            BIGINT       NOT NULL,
+    employee_id       BIGINT       NOT NULL,
+    employee_name     VARCHAR(50),
+    emp_no            VARCHAR(20),
+    gross_pay         DECIMAL(18,4),
+    social_insurance  DECIMAL(18,4),
+    housing_fund      DECIMAL(18,4),
+    iit               DECIMAL(18,4),
+    net_pay           DECIMAL(18,4),
+    is_exception      BOOLEAN      DEFAULT FALSE
+);
+
+-- py_compensation_master (薪酬档案)
+CREATE TABLE IF NOT EXISTS py_compensation_master (
+    id                BIGINT       NOT NULL PRIMARY KEY,
+    created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP,
+    created_by        BIGINT,
+    updated_by        BIGINT,
+    deleted           BOOLEAN      NOT NULL DEFAULT FALSE,
+    version           INT          NOT NULL DEFAULT 0,
+    tenant_id         BIGINT       NOT NULL DEFAULT 1,
+    employee_id       BIGINT       NOT NULL,
+    base_salary       DECIMAL(18,4),
+    position_salary   DECIMAL(18,4),
+    performance_base  DECIMAL(18,4),
+    allowance         DECIMAL(18,4),
+    effective_date    DATE         NOT NULL
+);
+
+-- py_iit_bracket (个税税率表)
+CREATE TABLE IF NOT EXISTS py_iit_bracket (
+    id               BIGINT        NOT NULL PRIMARY KEY,
+    lower_limit      DECIMAL(18,2),
+    upper_limit      DECIMAL(18,2),
+    rate             DECIMAL(5,4),
+    quick_deduction  DECIMAL(18,2)
+);
+
+-- py_social_insurance_rate (社保公积金比例)
+CREATE TABLE IF NOT EXISTS py_social_insurance_rate (
+    id                       BIGINT        NOT NULL PRIMARY KEY,
+    pension_personal         DECIMAL(5,4)  DEFAULT 0.08,
+    pension_company          DECIMAL(5,4)  DEFAULT 0.16,
+    medical_personal         DECIMAL(5,4)  DEFAULT 0.02,
+    medical_fixed_fee        DECIMAL(18,2) DEFAULT 3.00,
+    medical_company          DECIMAL(5,4)  DEFAULT 0.098,
+    unemployment_personal    DECIMAL(5,4)  DEFAULT 0.005,
+    unemployment_company     DECIMAL(5,4)  DEFAULT 0.005,
+    housing_fund_personal    DECIMAL(5,4)  DEFAULT 0.12,
+    housing_fund_company     DECIMAL(5,4)  DEFAULT 0.12
+);
+
+-- py_cumulative_tax_ledger (累计税台账)
+CREATE TABLE IF NOT EXISTS py_cumulative_tax_ledger (
+    id                    BIGINT       NOT NULL PRIMARY KEY,
+    created_at            TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP,
+    created_by            BIGINT,
+    updated_by            BIGINT,
+    deleted               BOOLEAN      NOT NULL DEFAULT FALSE,
+    version               INT          NOT NULL DEFAULT 0,
+    tenant_id             BIGINT       NOT NULL DEFAULT 1,
+    employee_id           BIGINT       NOT NULL,
+    tax_year              INT          NOT NULL,
+    cumulative_gross      DECIMAL(18,4) DEFAULT 0,
+    cumulative_social     DECIMAL(18,4) DEFAULT 0,
+    cumulative_housing_fund DECIMAL(18,4) DEFAULT 0,
+    cumulative_iit        DECIMAL(18,4) DEFAULT 0
+);
+
+-- py_year_end_bonus (年终奖)
+CREATE TABLE IF NOT EXISTS py_year_end_bonus (
+    id                      BIGINT       NOT NULL PRIMARY KEY,
+    created_at              TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at              TIMESTAMP,
+    created_by              BIGINT,
+    updated_by              BIGINT,
+    deleted                 BOOLEAN      NOT NULL DEFAULT FALSE,
+    version                 INT          NOT NULL DEFAULT 0,
+    tenant_id               BIGINT       NOT NULL DEFAULT 1,
+    employee_id             BIGINT       NOT NULL,
+    employee_name           VARCHAR(50),
+    emp_no                  VARCHAR(20),
+    bonus_year              INT          NOT NULL,
+    base_salary             DECIMAL(18,4),
+    bonus_months            DECIMAL(5,2) DEFAULT 1,
+    attendance_coefficient  DECIMAL(5,4) DEFAULT 1,
+    bonus_amount            DECIMAL(18,4),
+    tax_method              VARCHAR(20),
+    tax_amount              DECIMAL(18,4),
+    net_amount              DECIMAL(18,4),
+    status                  VARCHAR(15)  DEFAULT 'DRAFT'
+);
+
+-- py_bank_payment_batch (银行代发批次)
+CREATE TABLE IF NOT EXISTS py_bank_payment_batch (
+    id                   BIGINT       NOT NULL PRIMARY KEY,
+    created_at           TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP,
+    created_by           BIGINT,
+    updated_by           BIGINT,
+    deleted              BOOLEAN      NOT NULL DEFAULT FALSE,
+    version              INT          NOT NULL DEFAULT 0,
+    tenant_id            BIGINT       NOT NULL DEFAULT 1,
+    run_id               BIGINT       NOT NULL,
+    batch_no             VARCHAR(30)  NOT NULL,
+    bank_type            VARCHAR(20)  NOT NULL,
+    payer_account_name   VARCHAR(100),
+    payer_account_no     VARCHAR(50),
+    payer_bank_name      VARCHAR(100),
+    employee_count       INT          DEFAULT 0,
+    total_amount         DECIMAL(18,4) DEFAULT 0,
+    status               VARCHAR(15)  DEFAULT 'GENERATED',
+    file_path            VARCHAR(500),
+    remark               VARCHAR(500)
+);
+
+-- py_bank_payment_detail (银行代发明细)
+CREATE TABLE IF NOT EXISTS py_bank_payment_detail (
+    id              BIGINT       NOT NULL PRIMARY KEY,
+    created_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP,
+    created_by      BIGINT,
+    updated_by      BIGINT,
+    deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+    version         INT          NOT NULL DEFAULT 0,
+    tenant_id       BIGINT       NOT NULL DEFAULT 1,
+    batch_id        BIGINT       NOT NULL,
+    employee_id     BIGINT       NOT NULL,
+    employee_name   VARCHAR(50),
+    emp_no          VARCHAR(20),
+    bank_name       VARCHAR(100),
+    account_no      VARCHAR(50),
+    account_name    VARCHAR(50),
+    amount          DECIMAL(18,4),
+    purpose         VARCHAR(100)
+);
+
+-- py_payroll_simulation (工资模拟运行)
+CREATE TABLE IF NOT EXISTS py_payroll_simulation (
+    id                               BIGINT       NOT NULL PRIMARY KEY,
+    created_at                       TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at                       TIMESTAMP,
+    created_by                       BIGINT,
+    updated_by                       BIGINT,
+    deleted                          BOOLEAN      NOT NULL DEFAULT FALSE,
+    version                          INT          NOT NULL DEFAULT 0,
+    tenant_id                        BIGINT       NOT NULL DEFAULT 1,
+    period_id                        BIGINT       NOT NULL,
+    name                             VARCHAR(100) NOT NULL,
+    status                           VARCHAR(15)  DEFAULT 'DRAFT',
+    social_insurance_rate_override   VARCHAR(200),
+    housing_fund_rate_override       VARCHAR(200),
+    employee_count                   INT          DEFAULT 0,
+    total_gross                      DECIMAL(18,4) DEFAULT 0,
+    total_net                        DECIMAL(18,4) DEFAULT 0,
+    compared                         BOOLEAN      DEFAULT FALSE
+);
+
+-- py_simulation_detail (工资模拟明细)
+CREATE TABLE IF NOT EXISTS py_simulation_detail (
+    id                BIGINT       NOT NULL PRIMARY KEY,
+    created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP,
+    created_by        BIGINT,
+    updated_by        BIGINT,
+    deleted           BOOLEAN      NOT NULL DEFAULT FALSE,
+    version           INT          NOT NULL DEFAULT 0,
+    tenant_id         BIGINT       NOT NULL DEFAULT 1,
+    simulation_id     BIGINT       NOT NULL,
+    employee_id       BIGINT       NOT NULL,
+    employee_name     VARCHAR(50),
+    emp_no            VARCHAR(20),
+    gross_pay         DECIMAL(18,4),
+    social_insurance  DECIMAL(18,4),
+    housing_fund      DECIMAL(18,4),
+    iit               DECIMAL(18,4),
+    net_pay           DECIMAL(18,4),
+    diff_net_pay      DECIMAL(18,4)
+);
+
 -- sys_audit_log
 CREATE TABLE IF NOT EXISTS sys_audit_log (
     id            BIGINT       NOT NULL PRIMARY KEY,
@@ -353,3 +578,79 @@ CREATE TABLE IF NOT EXISTS sys_audit_log (
     status_code   INT,
     created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ============================================================
+-- 第二批增强：多地区社保 + 缺勤配额自动 + 职位一键发布
+-- ============================================================
+
+-- hr_employee 新增字段（多地区社保）
+ALTER TABLE hr_employee ADD COLUMN IF NOT EXISTS insurance_city VARCHAR(50);
+
+-- py_region_social_rate（多地区社保公积金比例）
+CREATE TABLE IF NOT EXISTS py_region_social_rate (
+    id                       BIGINT        NOT NULL PRIMARY KEY,
+    city                     VARCHAR(50)   NOT NULL,
+    pension_personal         DECIMAL(5,4)  DEFAULT 0.08,
+    pension_company          DECIMAL(5,4)  DEFAULT 0.16,
+    medical_personal         DECIMAL(5,4)  DEFAULT 0.02,
+    medical_fixed_fee        DECIMAL(18,2) DEFAULT 3.00,
+    medical_company          DECIMAL(5,4)  DEFAULT 0.098,
+    unemployment_personal    DECIMAL(5,4)  DEFAULT 0.005,
+    unemployment_company     DECIMAL(5,4)  DEFAULT 0.005,
+    injury_company           DECIMAL(5,4)  DEFAULT 0.004,
+    maternity_company        DECIMAL(5,4)  DEFAULT 0.008,
+    housing_fund_personal    DECIMAL(5,4)  DEFAULT 0.12,
+    housing_fund_company     DECIMAL(5,4)  DEFAULT 0.12,
+    social_base_floor        DECIMAL(18,2),
+    social_base_ceil         DECIMAL(18,2),
+    fund_base_floor          DECIMAL(18,2),
+    fund_base_ceil           DECIMAL(18,2),
+    enabled                  BOOLEAN       NOT NULL DEFAULT TRUE
+);
+CREATE INDEX IF NOT EXISTS idx_region_rate_city ON py_region_social_rate(city);
+
+-- at_leave_quota_rule（缺勤配额规则）
+CREATE TABLE IF NOT EXISTS at_leave_quota_rule (
+    id              BIGINT       NOT NULL PRIMARY KEY,
+    created_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP,
+    created_by      BIGINT,
+    updated_by      BIGINT,
+    deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+    version         INT          NOT NULL DEFAULT 0,
+    tenant_id       BIGINT       NOT NULL DEFAULT 1,
+    name            VARCHAR(100) NOT NULL,
+    code            VARCHAR(50)  NOT NULL,
+    leave_type_id   BIGINT       NOT NULL,
+    seniority_min   INT          NOT NULL DEFAULT 0,
+    seniority_max   INT,
+    grade_min       INT,
+    grade_max       INT,
+    quota_days      DECIMAL(5,1) NOT NULL,
+    enabled         BOOLEAN      NOT NULL DEFAULT TRUE,
+    sort_no         INT          NOT NULL DEFAULT 0
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_quota_rule_code ON at_leave_quota_rule(code);
+
+-- rc_requisition_publish（职位发布记录）
+CREATE TABLE IF NOT EXISTS rc_requisition_publish (
+    id              BIGINT       NOT NULL PRIMARY KEY,
+    created_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP,
+    created_by      BIGINT,
+    updated_by      BIGINT,
+    deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+    version         INT          NOT NULL DEFAULT 0,
+    tenant_id       BIGINT       NOT NULL DEFAULT 1,
+    requisition_id  BIGINT       NOT NULL,
+    channel         VARCHAR(30)  NOT NULL,
+    publish_url     VARCHAR(500),
+    status          VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
+    published_at    TIMESTAMP,
+    closed_at       TIMESTAMP,
+    fail_reason     VARCHAR(500),
+    view_count      INT          DEFAULT 0,
+    apply_count     INT          DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_publish_requisition ON rc_requisition_publish(requisition_id);
+CREATE INDEX IF NOT EXISTS idx_publish_channel ON rc_requisition_publish(channel);

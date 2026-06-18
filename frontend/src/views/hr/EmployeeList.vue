@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { listEmployees, getEmployee } from '@/api/employee';
+import { Upload } from '@element-plus/icons-vue';
+import {
+  listEmployees,
+  getEmployee,
+  batchImportEmployees,
+  exportEmployees,
+} from '@/api/employee';
+import type { BatchImportResultVo } from '@/api/employee';
 import type { EmployeeListVo } from '@/types/hr';
 
 const list = ref<EmployeeListVo[]>([]);
@@ -102,6 +109,45 @@ async function showDetail(row: EmployeeListVo): Promise<void> {
   }
 }
 
+// ==================== 批量导入 ====================
+const importLoading = ref(false);
+const importResultVisible = ref(false);
+const importResult = ref<BatchImportResultVo | null>(null);
+
+async function handleImport(options: { file: File }): Promise<void> {
+  importLoading.value = true;
+  try {
+    const result = await batchImportEmployees(options.file);
+    importResult.value = result;
+    importResultVisible.value = true;
+    if (result.allSuccess) {
+      ElMessage.success(`导入成功，共${result.successCount}条`);
+    } else {
+      ElMessage.warning(`导入完成：成功${result.successCount}条，失败${result.failCount}条`);
+    }
+    void fetchList();
+  } catch {
+    ElMessage.error('批量导入失败');
+  } finally {
+    importLoading.value = false;
+  }
+}
+
+// ==================== 导出 ====================
+const exportLoading = ref(false);
+
+async function handleExport(): Promise<void> {
+  exportLoading.value = true;
+  try {
+    await exportEmployees(query.status || undefined);
+    ElMessage.success('导出成功');
+  } catch {
+    ElMessage.error('导出失败');
+  } finally {
+    exportLoading.value = false;
+  }
+}
+
 onMounted(() => void fetchList());
 </script>
 
@@ -132,6 +178,18 @@ onMounted(() => void fetchList());
       <el-form-item>
         <el-button type="primary" @click="onSearch">查询</el-button>
         <el-button @click="onReset">重置</el-button>
+      </el-form-item>
+      <el-form-item style="float: right">
+        <el-upload
+          :show-file-list="false"
+          accept=".xlsx,.xls"
+          :http-request="handleImport"
+        >
+          <el-button :loading="importLoading" :icon="Upload" type="success">批量导入</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-form-item style="float: right">
+        <el-button :loading="exportLoading" type="warning" @click="handleExport">导出花名册</el-button>
       </el-form-item>
     </el-form>
 
@@ -214,6 +272,37 @@ onMounted(() => void fetchList());
             <el-table-column prop="status" label="状态" />
           </el-table>
         </template>
+      </template>
+    </el-dialog>
+
+    <!-- 导入结果弹窗 -->
+    <el-dialog v-model="importResultVisible" title="导入结果" width="600px">
+      <template v-if="importResult">
+        <el-descriptions :column="2" border style="margin-bottom: 16px">
+          <el-descriptions-item label="总行数">{{ importResult.totalRows }}</el-descriptions-item>
+          <el-descriptions-item label="成功数">
+            <el-tag type="success">{{ importResult.successCount }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="失败数">
+            <el-tag :type="importResult.failCount > 0 ? 'danger' : 'success'">{{ importResult.failCount }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="importResult.allSuccess ? 'success' : 'warning'">
+              {{ importResult.allSuccess ? '全部成功' : '部分失败' }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <template v-if="importResult.errors && importResult.errors.length > 0">
+          <h4 style="margin: 0 0 8px">错误详情</h4>
+          <el-table :data="importResult.errors" border size="small" max-height="300">
+            <el-table-column prop="rowNum" label="行号" width="80" />
+            <el-table-column prop="message" label="错误信息" />
+          </el-table>
+        </template>
+      </template>
+      <template #footer>
+        <el-button type="primary" @click="importResultVisible = false">确定</el-button>
       </template>
     </el-dialog>
   </div>

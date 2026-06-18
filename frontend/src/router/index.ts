@@ -82,6 +82,27 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/attendance/LeaveSettlement.vue'),
     meta: { requiresAuth: true, permission: 'at:settlement:list' },
   },
+  // ==================== 考勤异常管理 ====================
+  {
+    path: '/attendance/anomalies',
+    name: 'attendance-anomalies',
+    component: () => import('@/views/attendance/AttendanceAnomaly.vue'),
+    meta: { requiresAuth: true, permission: 'at:anomaly:list' },
+  },
+  // ==================== 调休管理 ====================
+  {
+    path: '/attendance/comp-leave',
+    name: 'attendance-comp-leave',
+    component: () => import('@/views/attendance/CompensatoryLeave.vue'),
+    meta: { requiresAuth: true, permission: 'at:comp:list' },
+  },
+  // ==================== 出差管理 ====================
+  {
+    path: '/attendance/business-trips',
+    name: 'attendance-business-trips',
+    component: () => import('@/views/attendance/BusinessTrip.vue'),
+    meta: { requiresAuth: true, permission: 'at:trip:list' },
+  },
   // ==================== 招聘管理 ====================
   {
     path: '/recruit/requisitions',
@@ -134,12 +155,50 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/hr/EmployeeList.vue'),
     meta: { requiresAuth: true, permission: 'hr:employee:list' },
   },
+  {
+    path: '/hr/contract-renewals',
+    name: 'hr-contract-renewals',
+    component: () => import('@/views/hr/ContractRenewal.vue'),
+    meta: { requiresAuth: true, permission: 'hr:contract-renewal:list' },
+  },
+  {
+    path: '/hr/probation-conversions',
+    name: 'hr-probation-conversions',
+    component: () => import('@/views/hr/ProbationConversion.vue'),
+    meta: { requiresAuth: true, permission: 'hr:probation:list' },
+  },
   // ==================== 绩效 ====================
   {
     path: '/performance/reviews',
     name: 'performance-reviews',
     component: () => import('@/views/performance/PerformanceReview.vue'),
     meta: { requiresAuth: true, permission: 'pf:appraisal:list' },
+  },
+  {
+    path: '/performance/goal-decomposition',
+    name: 'performance-goal-decomposition',
+    component: () => import('@/views/performance/GoalDecomposition.vue'),
+    meta: { requiresAuth: true, permission: 'pf:goal:list' },
+  },
+  {
+    path: '/performance/salary-adjustments',
+    name: 'performance-salary-adjustments',
+    component: () => import('@/views/performance/SalaryAdjustment.vue'),
+    meta: { requiresAuth: true, permission: 'pf:appraisal:list' },
+  },
+  // ==================== 法定报表 ====================
+  {
+    path: '/reports/statutory',
+    name: 'reports-statutory',
+    component: () => import('@/views/report/StatutoryReport.vue'),
+    meta: { requiresAuth: true, permission: 'report:statutory:export' },
+  },
+  // ==================== 证明开具 ====================
+  {
+    path: '/hr/certificates',
+    name: 'hr-certificates',
+    component: () => import('@/views/hr/Certificate.vue'),
+    meta: { requiresAuth: true, permission: 'cert:list' },
   },
   // ==================== 门户 ====================
   {
@@ -160,6 +219,25 @@ const routes: RouteRecordRaw[] = [
     name: 'system-roles',
     component: () => import('@/views/system/Role.vue'),
     meta: { requiresAuth: true, permission: 'role:view' },
+  },
+  // ==================== 报表 ====================
+  {
+    path: '/report/roster',
+    name: 'report-roster',
+    component: () => import('@/views/report/RosterReport.vue'),
+    meta: { requiresAuth: true, permission: 'hr:roster:view' },
+  },
+  {
+    path: '/report/attendance-monthly',
+    name: 'report-attendance-monthly',
+    component: () => import('@/views/report/AttendanceMonthlyReport.vue'),
+    meta: { requiresAuth: true, permission: 'at:report:view' },
+  },
+  {
+    path: '/report/payroll-summary',
+    name: 'report-payroll-summary',
+    component: () => import('@/views/report/PayrollSummaryReport.vue'),
+    meta: { requiresAuth: true, permission: 'py:report:view' },
   },
   // ==================== 错误页 ====================
   {
