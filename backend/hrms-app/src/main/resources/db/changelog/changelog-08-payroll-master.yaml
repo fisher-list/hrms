@@ -1,0 +1,1054 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 08-01 — py_compensation_master
+  # ============================================================
+  - changeSet:
+      id: 08-01-create-py-compensation-master
+      author: dev-be
+      comment: Compensation master table
+      changes:
+        - createTable:
+            tableName: py_compensation_master
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: base_salary
+                  type: "decimal(18,4)"
+              - column:
+                  name: position_salary
+                  type: "decimal(18,4)"
+              - column:
+                  name: performance_base
+                  type: "decimal(18,4)"
+              - column:
+                  name: allowance
+                  type: "decimal(18,4)"
+              - column:
+                  name: effective_date
+                  type: date
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: py_compensation_master
+
+  - changeSet:
+      id: 08-02-py-compensation-master-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_compensation_master
+            indexName: idx_compensation_emp
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: py_compensation_master
+            indexName: idx_compensation_emp
+
+  # ============================================================
+  # 08-03 — py_payroll_period
+  # ============================================================
+  - changeSet:
+      id: 08-03-create-py-payroll-period
+      author: dev-be
+      comment: Payroll period table
+      changes:
+        - createTable:
+            tableName: py_payroll_period
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: period_month
+                  type: varchar(7)
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(10)
+                  defaultValue: DRAFT
+      rollback:
+        - dropTable:
+            tableName: py_payroll_period
+
+  - changeSet:
+      id: 08-04-py-payroll-period-unique
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: py_payroll_period
+            columnNames: period_month, tenant_id
+            constraintName: uk_period_month
+      rollback:
+        - dropUniqueConstraint:
+            tableName: py_payroll_period
+            constraintName: uk_period_month
+
+  # ============================================================
+  # 08-05 — py_payroll_run
+  # ============================================================
+  - changeSet:
+      id: 08-05-create-py-payroll-run
+      author: dev-be
+      comment: Payroll run table
+      changes:
+        - createTable:
+            tableName: py_payroll_run
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: period_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: run_type
+                  type: varchar(10)
+                  defaultValue: NORMAL
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: DRAFT
+              - column:
+                  name: reverse_of_run_id
+                  type: bigint
+              - column:
+                  name: employee_count
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_gross
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_net
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: py_payroll_run
+
+  # ============================================================
+  # 08-06 — py_payroll_detail
+  # ============================================================
+  - changeSet:
+      id: 08-06-create-py-payroll-detail
+      author: dev-be
+      comment: Payroll detail table
+      changes:
+        - createTable:
+            tableName: py_payroll_detail
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: run_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_name
+                  type: varchar(50)
+              - column:
+                  name: emp_no
+                  type: varchar(20)
+              - column:
+                  name: gross_pay
+                  type: "decimal(18,4)"
+              - column:
+                  name: social_insurance
+                  type: "decimal(18,4)"
+              - column:
+                  name: housing_fund
+                  type: "decimal(18,4)"
+              - column:
+                  name: iit
+                  type: "decimal(18,4)"
+              - column:
+                  name: net_pay
+                  type: "decimal(18,4)"
+              - column:
+                  name: is_exception
+                  type: boolean
+                  defaultValueBoolean: false
+      rollback:
+        - dropTable:
+            tableName: py_payroll_detail
+
+  - changeSet:
+      id: 08-07-py-payroll-detail-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: py_payroll_detail
+            indexName: idx_detail_run
+            columns:
+              - column: { name: run_id }
+        - createIndex:
+            tableName: py_payroll_detail
+            indexName: idx_detail_emp
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: py_payroll_detail
+            indexName: idx_detail_run
+        - dropIndex:
+            tableName: py_payroll_detail
+            indexName: idx_detail_emp
+
+  # ============================================================
+  # 08-08 — py_iit_bracket
+  # ============================================================
+  - changeSet:
+      id: 08-08-create-py-iit-bracket
+      author: dev-be
+      comment: IIT progressive tax bracket table
+      changes:
+        - createTable:
+            tableName: py_iit_bracket
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: lower_limit
+                  type: "decimal(18,2)"
+              - column:
+                  name: upper_limit
+                  type: "decimal(18,2)"
+              - column:
+                  name: rate
+                  type: "decimal(5,4)"
+              - column:
+                  name: quick_deduction
+                  type: "decimal(18,2)"
+      rollback:
+        - dropTable:
+            tableName: py_iit_bracket
+
+  # ============================================================
+  # 08-09 — py_social_insurance_rate
+  # ============================================================
+  - changeSet:
+      id: 08-09-create-py-social-insurance-rate
+      author: dev-be
+      comment: Social insurance and housing fund rate table
+      changes:
+        - createTable:
+            tableName: py_social_insurance_rate
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: pension_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.08
+              - column:
+                  name: pension_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.16
+              - column:
+                  name: medical_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.02
+              - column:
+                  name: medical_fixed_fee
+                  type: "decimal(18,2)"
+                  defaultValueNumeric: 3.00
+              - column:
+                  name: medical_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.098
+              - column:
+                  name: unemployment_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.005
+              - column:
+                  name: unemployment_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.005
+              - column:
+                  name: housing_fund_personal
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.12
+              - column:
+                  name: housing_fund_company
+                  type: "decimal(5,4)"
+                  defaultValueNumeric: 0.12
+      rollback:
+        - dropTable:
+            tableName: py_social_insurance_rate
+
+  # ============================================================
+  # 08-10 — py_cumulative_tax_ledger
+  # ============================================================
+  - changeSet:
+      id: 08-10-create-py-cumulative-tax-ledger
+      author: dev-be
+      comment: Cumulative tax withholding ledger
+      changes:
+        - createTable:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: tax_year
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: cumulative_gross
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: cumulative_social
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: cumulative_housing_fund
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: cumulative_iit
+                  type: "decimal(18,4)"
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: py_cumulative_tax_ledger
+
+  - changeSet:
+      id: 08-11-py-cumulative-tax-ledger-unique
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: py_cumulative_tax_ledger
+            columnNames: employee_id, tax_year, tenant_id
+            constraintName: uk_ledger_emp_year
+      rollback:
+        - dropUniqueConstraint:
+            tableName: py_cumulative_tax_ledger
+            constraintName: uk_ledger_emp_year
+
+  # ============================================================
+  # 08-12 — Seed IIT brackets (2024 standard, 7 tiers)
+  # ============================================================
+  - changeSet:
+      id: 08-12-seed-iit-brackets
+      author: dev-be
+      comment: Seed IIT progressive tax brackets for 2024
+      context: seed
+      changes:
+        - insert:
+            tableName: py_iit_bracket
+            columns:
+              - column: { name: id, valueNumeric: 801 }
+              - column: { name: lower_limit, valueNumeric: 0 }
+              - column: { name: upper_limit, valueNumeric: 36000 }
+              - column: { name: rate, valueNumeric: 0.03 }
+              - column: { name: quick_deduction, valueNumeric: 0 }
+        - insert:
+            tableName: py_iit_bracket
+            columns:
+              - column: { name: id, valueNumeric: 802 }
+              - column: { name: lower_limit, valueNumeric: 36000 }
+              - column: { name: upper_limit, valueNumeric: 144000 }
+              - column: { name: rate, valueNumeric: 0.10 }
+              - column: { name: quick_deduction, valueNumeric: 2520 }
+        - insert:
+            tableName: py_iit_bracket
+            columns:
+              - column: { name: id, valueNumeric: 803 }
+              - column: { name: lower_limit, valueNumeric: 144000 }
+              - column: { name: upper_limit, valueNumeric: 300000 }
+              - column: { name: rate, valueNumeric: 0.20 }
+              - column: { name: quick_deduction, valueNumeric: 16920 }
+        - insert:
+            tableName: py_iit_bracket
+            columns:
+              - column: { name: id, valueNumeric: 804 }
+              - column: { name: lower_limit, valueNumeric: 300000 }
+              - column: { name: upper_limit, valueNumeric: 420000 }
+              - column: { name: rate, valueNumeric: 0.25 }
+              - column: { name: quick_deduction, valueNumeric: 31920 }
+        - insert:
+            tableName: py_iit_bracket
+            columns:
+              - column: { name: id, valueNumeric: 805 }
+              - column: { name: lower_limit, valueNumeric: 420000 }
+              - column: { name: upper_limit, valueNumeric: 660000 }
+              - column: { name: rate, valueNumeric: 0.30 }
+              - column: { name: quick_deduction, valueNumeric: 52920 }
+        - insert:
+            tableName: py_iit_bracket
+            columns:
+              - column: { name: id, valueNumeric: 806 }
+              - column: { name: lower_limit, valueNumeric: 660000 }
+              - column: { name: upper_limit, valueNumeric: 960000 }
+              - column: { name: rate, valueNumeric: 0.35 }
+              - column: { name: quick_deduction, valueNumeric: 85920 }
+        - insert:
+            tableName: py_iit_bracket
+            columns:
+              - column: { name: id, valueNumeric: 807 }
+              - column: { name: lower_limit, valueNumeric: 960000 }
+              - column: { name: upper_limit, valueNumeric: 99999999 }
+              - column: { name: rate, valueNumeric: 0.45 }
+              - column: { name: quick_deduction, valueNumeric: 181920 }
+      rollback:
+        - delete:
+            tableName: py_iit_bracket
+            where: "id BETWEEN 801 AND 807"
+
+  # ============================================================
+  # 08-13 — Seed social insurance rate (Beijing 2024)
+  # ============================================================
+  - changeSet:
+      id: 08-13-seed-social-insurance-rate
+      author: dev-be
+      comment: Seed Beijing 2024 social insurance and housing fund rates
+      context: seed
+      changes:
+        - insert:
+            tableName: py_social_insurance_rate
+            columns:
+              - column: { name: id, valueNumeric: 810 }
+              - column: { name: pension_personal, valueNumeric: 0.08 }
+              - column: { name: pension_company, valueNumeric: 0.16 }
+              - column: { name: medical_personal, valueNumeric: 0.02 }
+              - column: { name: medical_fixed_fee, valueNumeric: 3.00 }
+              - column: { name: medical_company, valueNumeric: 0.098 }
+              - column: { name: unemployment_personal, valueNumeric: 0.005 }
+              - column: { name: unemployment_company, valueNumeric: 0.005 }
+              - column: { name: housing_fund_personal, valueNumeric: 0.12 }
+              - column: { name: housing_fund_company, valueNumeric: 0.12 }
+      rollback:
+        - delete:
+            tableName: py_social_insurance_rate
+            where: "id = 810"
+
+  # ============================================================
+  # 08-14 — Seed compensation master for first 10 employees
+  # ============================================================
+  - changeSet:
+      id: 08-14-seed-compensation-master
+      author: dev-be
+      comment: Seed compensation records for first 10 employees
+      context: seed
+      changes:
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 821 }
+              - column: { name: employee_id, valueNumeric: 50001 }
+              - column: { name: base_salary, valueNumeric: 10000.0000 }
+              - column: { name: position_salary, valueNumeric: 2000.0000 }
+              - column: { name: performance_base, valueNumeric: 1000.0000 }
+              - column: { name: allowance, valueNumeric: 500.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 822 }
+              - column: { name: employee_id, valueNumeric: 50002 }
+              - column: { name: base_salary, valueNumeric: 11000.0000 }
+              - column: { name: position_salary, valueNumeric: 2500.0000 }
+              - column: { name: performance_base, valueNumeric: 1200.0000 }
+              - column: { name: allowance, valueNumeric: 600.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 823 }
+              - column: { name: employee_id, valueNumeric: 50003 }
+              - column: { name: base_salary, valueNumeric: 12000.0000 }
+              - column: { name: position_salary, valueNumeric: 3000.0000 }
+              - column: { name: performance_base, valueNumeric: 1500.0000 }
+              - column: { name: allowance, valueNumeric: 700.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 824 }
+              - column: { name: employee_id, valueNumeric: 50004 }
+              - column: { name: base_salary, valueNumeric: 13000.0000 }
+              - column: { name: position_salary, valueNumeric: 3500.0000 }
+              - column: { name: performance_base, valueNumeric: 1800.0000 }
+              - column: { name: allowance, valueNumeric: 800.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 825 }
+              - column: { name: employee_id, valueNumeric: 50005 }
+              - column: { name: base_salary, valueNumeric: 14000.0000 }
+              - column: { name: position_salary, valueNumeric: 4000.0000 }
+              - column: { name: performance_base, valueNumeric: 2000.0000 }
+              - column: { name: allowance, valueNumeric: 900.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 826 }
+              - column: { name: employee_id, valueNumeric: 50006 }
+              - column: { name: base_salary, valueNumeric: 15000.0000 }
+              - column: { name: position_salary, valueNumeric: 4500.0000 }
+              - column: { name: performance_base, valueNumeric: 2200.0000 }
+              - column: { name: allowance, valueNumeric: 1000.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 827 }
+              - column: { name: employee_id, valueNumeric: 50007 }
+              - column: { name: base_salary, valueNumeric: 16000.0000 }
+              - column: { name: position_salary, valueNumeric: 3000.0000 }
+              - column: { name: performance_base, valueNumeric: 2500.0000 }
+              - column: { name: allowance, valueNumeric: 700.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 828 }
+              - column: { name: employee_id, valueNumeric: 50008 }
+              - column: { name: base_salary, valueNumeric: 17000.0000 }
+              - column: { name: position_salary, valueNumeric: 3500.0000 }
+              - column: { name: performance_base, valueNumeric: 2800.0000 }
+              - column: { name: allowance, valueNumeric: 800.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 829 }
+              - column: { name: employee_id, valueNumeric: 50009 }
+              - column: { name: base_salary, valueNumeric: 18000.0000 }
+              - column: { name: position_salary, valueNumeric: 4000.0000 }
+              - column: { name: performance_base, valueNumeric: 2000.0000 }
+              - column: { name: allowance, valueNumeric: 900.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+        - insert:
+            tableName: py_compensation_master
+            columns:
+              - column: { name: id, valueNumeric: 830 }
+              - column: { name: employee_id, valueNumeric: 50010 }
+              - column: { name: base_salary, valueNumeric: 20000.0000 }
+              - column: { name: position_salary, valueNumeric: 5000.0000 }
+              - column: { name: performance_base, valueNumeric: 3000.0000 }
+              - column: { name: allowance, valueNumeric: 1000.0000 }
+              - column: { name: effective_date, value: "2026-01-01" }
+      rollback:
+        - delete:
+            tableName: py_compensation_master
+            where: "id BETWEEN 821 AND 830"
+
+  # ============================================================
+  # 08-15 — Seed cumulative tax ledger for 2026 (employees 50001-50020)
+  # ============================================================
+  - changeSet:
+      id: 08-15-seed-cumulative-tax-ledger
+      author: dev-be
+      comment: Seed cumulative tax ledger rows for 2026
+      context: seed
+      changes:
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 841 }
+              - column: { name: employee_id, valueNumeric: 50001 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 842 }
+              - column: { name: employee_id, valueNumeric: 50002 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 843 }
+              - column: { name: employee_id, valueNumeric: 50003 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 844 }
+              - column: { name: employee_id, valueNumeric: 50004 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 845 }
+              - column: { name: employee_id, valueNumeric: 50005 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 846 }
+              - column: { name: employee_id, valueNumeric: 50006 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 847 }
+              - column: { name: employee_id, valueNumeric: 50007 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 848 }
+              - column: { name: employee_id, valueNumeric: 50008 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 849 }
+              - column: { name: employee_id, valueNumeric: 50009 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 850 }
+              - column: { name: employee_id, valueNumeric: 50010 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 851 }
+              - column: { name: employee_id, valueNumeric: 50011 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 852 }
+              - column: { name: employee_id, valueNumeric: 50012 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 853 }
+              - column: { name: employee_id, valueNumeric: 50013 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 854 }
+              - column: { name: employee_id, valueNumeric: 50014 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 855 }
+              - column: { name: employee_id, valueNumeric: 50015 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 856 }
+              - column: { name: employee_id, valueNumeric: 50016 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 857 }
+              - column: { name: employee_id, valueNumeric: 50017 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 858 }
+              - column: { name: employee_id, valueNumeric: 50018 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 859 }
+              - column: { name: employee_id, valueNumeric: 50019 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+        - insert:
+            tableName: py_cumulative_tax_ledger
+            columns:
+              - column: { name: id, valueNumeric: 860 }
+              - column: { name: employee_id, valueNumeric: 50020 }
+              - column: { name: tax_year, valueNumeric: 2026 }
+              - column: { name: cumulative_gross, valueNumeric: 0 }
+              - column: { name: cumulative_social, valueNumeric: 0 }
+              - column: { name: cumulative_housing_fund, valueNumeric: 0 }
+              - column: { name: cumulative_iit, valueNumeric: 0 }
+      rollback:
+        - delete:
+            tableName: py_cumulative_tax_ledger
+            where: "id BETWEEN 841 AND 860"
+
+  # ============================================================
+  # 08-16 — Seed payroll permissions
+  # ============================================================
+  - changeSet:
+      id: 08-16-seed-payroll-permissions
+      author: dev-be
+      comment: Insert payroll module permissions
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 871 }
+              - column: { name: code, value: "py:compensation:edit" }
+              - column: { name: name, value: "编辑薪资档案" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 872 }
+              - column: { name: code, value: "py:compensation:list" }
+              - column: { name: name, value: "查看薪资档案" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 873 }
+              - column: { name: code, value: "py:period:edit" }
+              - column: { name: name, value: "编辑工资周期" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 874 }
+              - column: { name: code, value: "py:period:list" }
+              - column: { name: name, value: "查看工资周期" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 875 }
+              - column: { name: code, value: "py:run:create" }
+              - column: { name: name, value: "创建工资Run" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 876 }
+              - column: { name: code, value: "py:run:calculate" }
+              - column: { name: name, value: "执行工资计算" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 877 }
+              - column: { name: code, value: "py:run:lock" }
+              - column: { name: name, value: "锁定工资Run" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 878 }
+              - column: { name: code, value: "py:run:reverse" }
+              - column: { name: name, value: "红冲工资Run" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 879 }
+              - column: { name: code, value: "py:payslip:list" }
+              - column: { name: name, value: "查看工资条" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 880 }
+              - column: { name: code, value: "py:run:list" }
+              - column: { name: name, value: "查看工资Run" }
+              - column: { name: type, value: "button" }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 871 AND 880"
+
+  # ============================================================
+  # 08-17 — Map payroll permissions to ADMIN role
+  # ============================================================
+  - changeSet:
+      id: 08-17-seed-admin-role-payroll-permissions
+      author: dev-be
+      comment: Map payroll permissions to ADMIN role
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90017 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 871 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90018 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 872 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90019 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 873 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90020 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 874 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90021 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 875 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90022 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 876 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90023 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 877 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90024 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 878 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90025 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 879 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90026 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 880 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 871 AND 880"

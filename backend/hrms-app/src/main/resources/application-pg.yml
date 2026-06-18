@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: ${HRMS_DB_URL:jdbc:postgresql://localhost:5432/hrms}
+    driver-class-name: org.postgresql.Driver
+    username: ${HRMS_DB_USERNAME:hrms}
+    password: ${HRMS_DB_PASSWORD:hrms}
+  liquibase:
+    default-schema: ${HRMS_SCHEMA:public}

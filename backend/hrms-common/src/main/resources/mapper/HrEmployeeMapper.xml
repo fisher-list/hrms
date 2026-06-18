@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrms.common.employee.mapper.HrEmployeeMapper">
+
+    <!--
+        Bug fix: removed the OGNL <choose> block that referenced
+        @com.hrms.common.rbac.datascope.DataScopeContext@get().
+        The DataScopeInterceptor (a MyBatis-Plus plugin) is the single
+        source of truth for row-level data-scope filtering, and it rewrites
+        the SQL via BoundSql reflection. Calling the OGNL static accessor
+        inside the XML was both redundant and fragile (it NPE'd in the
+        admin path, producing 500 "服务器内部错误" from the global handler).
+    -->
+    <select id="selectPageWithDept" resultType="com.hrms.common.employee.entity.HrEmployee">
+        SELECT e.*
+        FROM hr_employee e
+        <where>
+            e.deleted = false
+            <if test="keyword != null and keyword != ''">
+                AND (e.name LIKE CONCAT('%', #{keyword}, '%') OR e.emp_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null and status != ''">
+                AND e.status = #{status}
+            </if>
+        </where>
+        ORDER BY e.created_at DESC
+    </select>
+
+</mapper>

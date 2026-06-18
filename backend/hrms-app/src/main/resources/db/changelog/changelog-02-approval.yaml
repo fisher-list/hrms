@@ -1,0 +1,446 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 02-01 — approval_definition table
+  # ============================================================
+  - changeSet:
+      id: 02-01-create-approval-definition
+      author: dev-be
+      comment: Approval workflow definition template
+      changes:
+        - createTable:
+            tableName: approval_definition
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column:
+                  name: business_type
+                  type: varchar(32)
+                  constraints: { nullable: false }
+              - column:
+                  name: nodes
+                  type: text
+                  constraints: { nullable: false }
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: approval_definition
+
+  - changeSet:
+      id: 02-02-approval-definition-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: approval_definition
+            columnNames: code
+            constraintName: uk_approval_def_code
+      rollback:
+        - dropUniqueConstraint:
+            tableName: approval_definition
+            constraintName: uk_approval_def_code
+
+  # ============================================================
+  # 02-03 — approval_instance table
+  # ============================================================
+  - changeSet:
+      id: 02-03-create-approval-instance
+      author: dev-be
+      comment: Running approval workflow instance
+      changes:
+        - createTable:
+            tableName: approval_instance
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: definition_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: business_type
+                  type: varchar(32)
+                  constraints: { nullable: false }
+              - column:
+                  name: business_key
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column:
+                  name: applicant_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: current_node_seq
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(16)
+                  constraints: { nullable: false }
+              - column: { name: payload, type: text }
+              - column: { name: started_at, type: timestamp }
+              - column: { name: finished_at, type: timestamp }
+      rollback:
+        - dropTable:
+            tableName: approval_instance
+
+  - changeSet:
+      id: 02-04-approval-instance-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: approval_instance
+            indexName: idx_instance_definition
+            columns:
+              - column: { name: definition_id }
+        - createIndex:
+            tableName: approval_instance
+            indexName: idx_instance_business
+            columns:
+              - column: { name: business_type }
+              - column: { name: business_key }
+        - createIndex:
+            tableName: approval_instance
+            indexName: idx_instance_applicant
+            columns:
+              - column: { name: applicant_id }
+        - createIndex:
+            tableName: approval_instance
+            indexName: idx_instance_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropIndex:
+            tableName: approval_instance
+            indexName: idx_instance_definition
+        - dropIndex:
+            tableName: approval_instance
+            indexName: idx_instance_business
+        - dropIndex:
+            tableName: approval_instance
+            indexName: idx_instance_applicant
+        - dropIndex:
+            tableName: approval_instance
+            indexName: idx_instance_status
+
+  # ============================================================
+  # 02-05 — approval_task table
+  # ============================================================
+  - changeSet:
+      id: 02-05-create-approval-task
+      author: dev-be
+      comment: Individual approval task assigned to an approver
+      changes:
+        - createTable:
+            tableName: approval_task
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: instance_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: node_seq
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: assignee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(16)
+                  constraints: { nullable: false }
+              - column: { name: assigned_at, type: timestamp }
+              - column: { name: acted_at, type: timestamp }
+      rollback:
+        - dropTable:
+            tableName: approval_task
+
+  - changeSet:
+      id: 02-06-approval-task-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: approval_task
+            indexName: idx_task_instance
+            columns:
+              - column: { name: instance_id }
+        - createIndex:
+            tableName: approval_task
+            indexName: idx_task_assignee_status
+            columns:
+              - column: { name: assignee_id }
+              - column: { name: status }
+      rollback:
+        - dropIndex:
+            tableName: approval_task
+            indexName: idx_task_instance
+        - dropIndex:
+            tableName: approval_task
+            indexName: idx_task_assignee_status
+
+  # ============================================================
+  # 02-07 — approval_history table
+  # ============================================================
+  - changeSet:
+      id: 02-07-create-approval-history
+      author: dev-be
+      comment: Immutable audit trail for approval actions
+      changes:
+        - createTable:
+            tableName: approval_history
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: instance_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: task_id, type: bigint }
+              - column:
+                  name: node_seq
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: actor_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: action
+                  type: varchar(32)
+                  constraints: { nullable: false }
+              - column: { name: comment, type: text }
+              - column:
+                  name: acted_at
+                  type: timestamp
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: approval_history
+
+  - changeSet:
+      id: 02-08-approval-history-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: approval_history
+            indexName: idx_history_instance
+            columns:
+              - column: { name: instance_id }
+      rollback:
+        - dropIndex:
+            tableName: approval_history
+            indexName: idx_history_instance
+
+  # ============================================================
+  # 02-09 — seed MOCK_LEAVE approval definition (3-node serial)
+  # ============================================================
+  - changeSet:
+      id: 02-09-seed-approval-definition
+      author: dev-be
+      comment: Seed MOCK_LEAVE 3-node serial approval definition
+      changes:
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: code, value: MOCK_LEAVE }
+              - column: { name: name, value: "Mock Leave Approval" }
+              - column: { name: business_type, value: LEAVE }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"直属经理","approverRule":"EMP_MANAGER"},{"seq":2,"name":"HR审核","approverRule":"ROLE:HR_MANAGER"},{"seq":3,"name":"Admin终审","approverRule":"ROLE:ADMIN"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: approval_definition
+            where: code = 'MOCK_LEAVE'
+
+  # ============================================================
+  # 02-10 — seed approval permissions
+  # ============================================================
+  - changeSet:
+      id: 02-10-seed-approval-permissions
+      author: dev-be
+      comment: Seed approval:view and approval:approve permissions
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1070 }
+              - column: { name: code, value: "approval:view" }
+              - column: { name: name, value: "View approvals" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 70 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1071 }
+              - column: { name: code, value: "approval:approve" }
+              - column: { name: name, value: "Approve/reject/revoke" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 71 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "code LIKE 'approval:%'"
+
+  # ============================================================
+  # 02-11 — assign approval permissions to roles
+  # ============================================================
+  - changeSet:
+      id: 02-11-seed-approval-role-permission
+      author: dev-be
+      comment: Assign approval permissions to roles
+      changes:
+        # ADMIN gets all approval permissions
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 60000, 100, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND code LIKE 'approval:%'
+        # HR_MANAGER gets approval:view and approval:approve
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 61000, 101, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND code LIKE 'approval:%'
+        # LINE_MANAGER gets approval:view and approval:approve
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 62000, 102, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND code LIKE 'approval:%'
+        # EMPLOYEE gets approval:view only
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 63000, 103, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND code = 'approval:view'
+      rollback:
+        - sql:
+            sql: >
+              DELETE FROM sys_role_permission
+              WHERE permission_id IN (SELECT id FROM sys_permission WHERE code LIKE 'approval:%')

@@ -1,0 +1,441 @@
+{
+  "environment": {
+    "frontend": "http://localhost:5173",
+    "backend": "http://localhost:8080",
+    "username": "admin"
+  },
+  "login": {
+    "initial_url": "http://localhost:5173/login?redirect=/dashboard",
+    "login_page_visible": true,
+    "status": "WARN",
+    "final_url": "http://localhost:5173/403",
+    "dashboard_visible": false,
+    "welcome_visible": false
+  },
+  "modules": [
+    {
+      "epic": "Dashboard",
+      "path": "/dashboard",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/dashboard",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/dashboard"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/Dashboard_failure.png"
+    },
+    {
+      "epic": "组织员工-组织树",
+      "path": "/org/tree",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/org/tree",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/org/tree"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png"
+    },
+    {
+      "epic": "组织员工-员工档案",
+      "path": "/hr/employees",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/hr/employees",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/hr/employees"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png"
+    },
+    {
+      "epic": "考勤假期-请假申请",
+      "path": "/attendance/leave/new",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/attendance/leave/new",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/attendance/leave/new"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png"
+    },
+    {
+      "epic": "薪酬-薪酬批次",
+      "path": "/payroll/runs",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/payroll/runs",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/payroll/runs"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png"
+    },
+    {
+      "epic": "招聘-Offer",
+      "path": "/recruit/offers",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/recruit/offers",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/recruit/offers"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/_-Offer_failure.png"
+    },
+    {
+      "epic": "绩效-绩效评审",
+      "path": "/performance/reviews",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/performance/reviews",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/performance/reviews"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png"
+    },
+    {
+      "epic": "ESS-员工自助",
+      "path": "/portal/ess",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/portal/ess",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/portal/ess"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/ESS-__failure.png"
+    },
+    {
+      "epic": "MSS-经理自助",
+      "path": "/portal/mss",
+      "status": "FAIL",
+      "steps": [],
+      "url": "http://localhost:5173/login?redirect=/portal/mss",
+      "body_excerpt": "HRMS 登录\n用户名\n密码\n登录",
+      "failures": [
+        {
+          "action": "route",
+          "error": "访问模块被重定向到登录页",
+          "url": "http://localhost:5173/login?redirect=/portal/mss"
+        }
+      ],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts/MSS-__failure.png"
+    }
+  ],
+  "network_errors": [
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/login",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    },
+    {
+      "status": 403,
+      "url": "http://localhost:5173/api/auth/refresh",
+      "method": "POST",
+      "body": "Invalid CORS request"
+    }
+  ],
+  "console_errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    }
+  ],
+  "page_errors": [],
+  "screenshots": [
+    "/Users/apple/hrms/.codex-browser-artifacts/login_dashboard.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/Dashboard_failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/_-Offer_failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/_-__failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/ESS-__failure.png",
+    "/Users/apple/hrms/.codex-browser-artifacts/MSS-__failure.png"
+  ],
+  "dashboard_quick_links": [
+    {
+      "label": "员工自助 (ESS)",
+      "expected_path": "/portal/ess",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"员工自助 (ESS)\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    },
+    {
+      "label": "经理自助 (MSS)",
+      "expected_path": "/portal/mss",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"经理自助 (MSS)\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    },
+    {
+      "label": "组织树",
+      "expected_path": "/org/tree",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"组织树\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    },
+    {
+      "label": "员工档案",
+      "expected_path": "/hr/employees",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"员工档案\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    },
+    {
+      "label": "请假申请",
+      "expected_path": "/attendance/leave/new",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"请假申请\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    },
+    {
+      "label": "薪酬批次",
+      "expected_path": "/payroll/runs",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"薪酬批次\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    },
+    {
+      "label": "招聘 Offer",
+      "expected_path": "/recruit/offers",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"招聘 Offer\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    },
+    {
+      "label": "绩效评审",
+      "expected_path": "/performance/reviews",
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 5000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"绩效评审\")\n",
+      "actual_url": "http://localhost:5173/login?redirect=/dashboard"
+    }
+  ],
+  "duration_seconds": 76.4
+}

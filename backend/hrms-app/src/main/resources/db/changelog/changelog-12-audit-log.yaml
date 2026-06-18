@@ -1,0 +1,64 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 12-01 — sys_audit_log table
+  # ============================================================
+  - changeSet:
+      id: 12-01-create-sys-audit-log
+      author: dev-be
+      comment: Operation audit log table
+      changes:
+        - createTable:
+            tableName: sys_audit_log
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column: { name: user_id, type: bigint }
+              - column: { name: username, type: varchar(64) }
+              - column: { name: action, type: varchar(128) }
+              - column: { name: resource_type, type: varchar(128) }
+              - column: { name: resource_id, type: varchar(64) }
+              - column: { name: ip_address, type: varchar(64) }
+              - column: { name: user_agent, type: varchar(512) }
+              - column: { name: request_method, type: varchar(16) }
+              - column: { name: request_uri, type: varchar(512) }
+              - column: { name: status_code, type: int }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+      rollback:
+        - dropTable:
+            tableName: sys_audit_log
+
+  - changeSet:
+      id: 12-02-sys-audit-log-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: sys_audit_log
+            indexName: idx_audit_log_user_id
+            columns:
+              - column: { name: user_id }
+        - createIndex:
+            tableName: sys_audit_log
+            indexName: idx_audit_log_created_at
+            columns:
+              - column: { name: created_at }
+        - createIndex:
+            tableName: sys_audit_log
+            indexName: idx_audit_log_action
+            columns:
+              - column: { name: action }
+      rollback:
+        - dropIndex:
+            tableName: sys_audit_log
+            indexName: idx_audit_log_user_id
+        - dropIndex:
+            tableName: sys_audit_log
+            indexName: idx_audit_log_created_at
+        - dropIndex:
+            tableName: sys_audit_log
+            indexName: idx_audit_log_action

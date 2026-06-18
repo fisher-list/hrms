@@ -1,0 +1,1128 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 04-01 — hr_employee master table
+  # ============================================================
+  - changeSet:
+      id: 04-01-create-hr-employee
+      author: dev-be
+      comment: Employee master table
+      changes:
+        - createTable:
+            tableName: hr_employee
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: emp_no
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column: { name: gender, type: "char(1)" }
+              - column: { name: birth_date, type: date }
+              - column: { name: id_card_enc, type: text }
+              - column: { name: phone_enc, type: text }
+              - column: { name: email, type: varchar(100) }
+              - column: { name: dept_id, type: bigint }
+              - column: { name: position_id, type: bigint }
+              - column: { name: hire_date, type: date }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING_HIRE
+                  constraints: { nullable: false }
+              - column: { name: contract_start, type: date }
+              - column: { name: contract_end, type: date }
+              - column: { name: probation_end, type: date }
+              - column: { name: emergency_contact, type: varchar(50) }
+              - column: { name: emergency_phone_enc, type: text }
+      rollback:
+        - dropTable:
+            tableName: hr_employee
+
+  - changeSet:
+      id: 04-02-hr-employee-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: hr_employee
+            columnNames: emp_no
+            constraintName: uk_employee_emp_no
+        - createIndex:
+            tableName: hr_employee
+            indexName: idx_employee_dept
+            columns:
+              - column: { name: dept_id }
+        - createIndex:
+            tableName: hr_employee
+            indexName: idx_employee_position
+            columns:
+              - column: { name: position_id }
+        - createIndex:
+            tableName: hr_employee
+            indexName: idx_employee_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropUniqueConstraint:
+            tableName: hr_employee
+            constraintName: uk_employee_emp_no
+        - dropIndex:
+            tableName: hr_employee
+            indexName: idx_employee_dept
+        - dropIndex:
+            tableName: hr_employee
+            indexName: idx_employee_position
+        - dropIndex:
+            tableName: hr_employee
+            indexName: idx_employee_status
+
+  - changeSet:
+      id: 04-15-add-hr-employee-id-card-hash
+      author: codex
+      comment: Add keyed hash for ID card duplicate checks while keeping AES-GCM randomized
+      changes:
+        - addColumn:
+            tableName: hr_employee
+            columns:
+              - column:
+                  name: id_card_hash
+                  type: varchar(64)
+        - addUniqueConstraint:
+            tableName: hr_employee
+            columnNames: id_card_hash
+            constraintName: uk_employee_id_card_hash
+      rollback:
+        - dropUniqueConstraint:
+            tableName: hr_employee
+            constraintName: uk_employee_id_card_hash
+        - dropColumn:
+            tableName: hr_employee
+            columnName: id_card_hash
+
+  # ============================================================
+  # 04-03 — hr_employee_education
+  # ============================================================
+  - changeSet:
+      id: 04-03-create-hr-employee-education
+      author: dev-be
+      comment: Employee education history
+      changes:
+        - createTable:
+            tableName: hr_employee_education
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: school, type: varchar(100) }
+              - column: { name: degree, type: varchar(20) }
+              - column: { name: major, type: varchar(100) }
+              - column: { name: start_date, type: date }
+              - column: { name: end_date, type: date }
+              - column:
+                  name: is_highest
+                  type: boolean
+                  defaultValueBoolean: false
+      rollback:
+        - dropTable:
+            tableName: hr_employee_education
+
+  - changeSet:
+      id: 04-04-hr-employee-education-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: hr_employee_education
+            indexName: idx_edu_employee
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: hr_employee_education
+            indexName: idx_edu_employee
+
+  # ============================================================
+  # 04-05 — hr_employee_work_exp
+  # ============================================================
+  - changeSet:
+      id: 04-05-create-hr-employee-work-exp
+      author: dev-be
+      comment: Employee work experience
+      changes:
+        - createTable:
+            tableName: hr_employee_work_exp
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: company_name, type: varchar(100) }
+              - column: { name: position, type: varchar(100) }
+              - column: { name: start_date, type: date }
+              - column: { name: end_date, type: date }
+              - column: { name: reason_for_leaving, type: varchar(200) }
+      rollback:
+        - dropTable:
+            tableName: hr_employee_work_exp
+
+  - changeSet:
+      id: 04-06-hr-employee-work-exp-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: hr_employee_work_exp
+            indexName: idx_workexp_employee
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: hr_employee_work_exp
+            indexName: idx_workexp_employee
+
+  # ============================================================
+  # 04-07 — hr_employee_family
+  # ============================================================
+  - changeSet:
+      id: 04-07-create-hr-employee-family
+      author: dev-be
+      comment: Employee family members
+      changes:
+        - createTable:
+            tableName: hr_employee_family
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: name, type: varchar(50) }
+              - column: { name: relationship, type: varchar(20) }
+              - column: { name: phone_enc, type: text }
+              - column:
+                  name: is_emergency
+                  type: boolean
+                  defaultValueBoolean: false
+      rollback:
+        - dropTable:
+            tableName: hr_employee_family
+
+  - changeSet:
+      id: 04-08-hr-employee-family-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: hr_employee_family
+            indexName: idx_family_employee
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: hr_employee_family
+            indexName: idx_family_employee
+
+  # ============================================================
+  # 04-09 — hr_employee_contract
+  # ============================================================
+  - changeSet:
+      id: 04-09-create-hr-employee-contract
+      author: dev-be
+      comment: Employee contracts
+      changes:
+        - createTable:
+            tableName: hr_employee_contract
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: contract_no, type: varchar(50) }
+              - column: { name: contract_type, type: varchar(20) }
+              - column: { name: start_date, type: date }
+              - column: { name: end_date, type: date }
+              - column: { name: signing_date, type: date }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: ACTIVE
+      rollback:
+        - dropTable:
+            tableName: hr_employee_contract
+
+  - changeSet:
+      id: 04-10-hr-employee-contract-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: hr_employee_contract
+            indexName: idx_contract_employee
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: hr_employee_contract
+            indexName: idx_contract_employee
+
+  # ============================================================
+  # 04-11 — hr_employee_bank_account
+  # ============================================================
+  - changeSet:
+      id: 04-11-create-hr-employee-bank-account
+      author: dev-be
+      comment: Employee bank accounts
+      changes:
+        - createTable:
+            tableName: hr_employee_bank_account
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: bank_name, type: varchar(100) }
+              - column: { name: account_no_enc, type: text }
+              - column: { name: account_name, type: varchar(50) }
+              - column:
+                  name: is_primary
+                  type: boolean
+                  defaultValueBoolean: false
+      rollback:
+        - dropTable:
+            tableName: hr_employee_bank_account
+
+  - changeSet:
+      id: 04-12-hr-employee-bank-account-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: hr_employee_bank_account
+            indexName: idx_bank_employee
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: hr_employee_bank_account
+            indexName: idx_bank_employee
+
+  # ============================================================
+  # 04-13 — hr_employee_address
+  # ============================================================
+  - changeSet:
+      id: 04-13-create-hr-employee-address
+      author: dev-be
+      comment: Employee addresses
+      changes:
+        - createTable:
+            tableName: hr_employee_address
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: type
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column: { name: province, type: varchar(50) }
+              - column: { name: city, type: varchar(50) }
+              - column: { name: district, type: varchar(50) }
+              - column: { name: detail, type: varchar(255) }
+      rollback:
+        - dropTable:
+            tableName: hr_employee_address
+
+  - changeSet:
+      id: 04-14-hr-employee-address-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: hr_employee_address
+            indexName: idx_address_employee
+            columns:
+              - column: { name: employee_id }
+      rollback:
+        - dropIndex:
+            tableName: hr_employee_address
+            indexName: idx_address_employee
+
+  # ============================================================
+  # 04-15 — hr_hire_form
+  # ============================================================
+  - changeSet:
+      id: 04-15-create-hr-hire-form
+      author: dev-be
+      comment: Hire form for new employee onboarding
+      changes:
+        - createTable:
+            tableName: hr_hire_form
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: form_no
+                  type: varchar(32)
+                  constraints: { nullable: false }
+              - column: { name: employee_snapshot, type: text }
+              - column: { name: position_id, type: bigint }
+              - column: { name: dept_id, type: bigint }
+              - column: { name: hire_date, type: date }
+              - column: { name: account_name, type: varchar(50) }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column: { name: approval_instance_id, type: bigint }
+              - column: { name: created_employee_id, type: bigint }
+      rollback:
+        - dropTable:
+            tableName: hr_hire_form
+
+  - changeSet:
+      id: 04-16-hr-hire-form-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: hr_hire_form
+            columnNames: form_no
+            constraintName: uk_hire_form_no
+        - createIndex:
+            tableName: hr_hire_form
+            indexName: idx_hire_form_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropUniqueConstraint:
+            tableName: hr_hire_form
+            constraintName: uk_hire_form_no
+        - dropIndex:
+            tableName: hr_hire_form
+            indexName: idx_hire_form_status
+
+  # ============================================================
+  # 04-17 — hr_transfer_form
+  # ============================================================
+  - changeSet:
+      id: 04-17-create-hr-transfer-form
+      author: dev-be
+      comment: Transfer form for employee position/department change
+      changes:
+        - createTable:
+            tableName: hr_transfer_form
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: form_no
+                  type: varchar(32)
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: from_dept_id, type: bigint }
+              - column: { name: from_position_id, type: bigint }
+              - column: { name: to_dept_id, type: bigint }
+              - column: { name: to_position_id, type: bigint }
+              - column: { name: transfer_type, type: varchar(20) }
+              - column: { name: effective_date, type: date }
+              - column: { name: reason, type: varchar(500) }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column: { name: approval_instance_id, type: bigint }
+      rollback:
+        - dropTable:
+            tableName: hr_transfer_form
+
+  - changeSet:
+      id: 04-18-hr-transfer-form-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: hr_transfer_form
+            columnNames: form_no
+            constraintName: uk_transfer_form_no
+        - createIndex:
+            tableName: hr_transfer_form
+            indexName: idx_transfer_form_employee
+            columns:
+              - column: { name: employee_id }
+        - createIndex:
+            tableName: hr_transfer_form
+            indexName: idx_transfer_form_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropUniqueConstraint:
+            tableName: hr_transfer_form
+            constraintName: uk_transfer_form_no
+        - dropIndex:
+            tableName: hr_transfer_form
+            indexName: idx_transfer_form_employee
+        - dropIndex:
+            tableName: hr_transfer_form
+            indexName: idx_transfer_form_status
+
+  # ============================================================
+  # 04-19 — hr_termination_form
+  # ============================================================
+  - changeSet:
+      id: 04-19-create-hr-termination-form
+      author: dev-be
+      comment: Termination form for employee offboarding
+      changes:
+        - createTable:
+            tableName: hr_termination_form
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+              - column:
+                  name: form_no
+                  type: varchar(32)
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: termination_type, type: varchar(20) }
+              - column: { name: reason, type: varchar(500) }
+              - column: { name: last_working_day, type: date }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column: { name: approval_instance_id, type: bigint }
+      rollback:
+        - dropTable:
+            tableName: hr_termination_form
+
+  - changeSet:
+      id: 04-20-hr-termination-form-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: hr_termination_form
+            columnNames: form_no
+            constraintName: uk_termination_form_no
+        - createIndex:
+            tableName: hr_termination_form
+            indexName: idx_term_form_employee
+            columns:
+              - column: { name: employee_id }
+        - createIndex:
+            tableName: hr_termination_form
+            indexName: idx_term_form_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropUniqueConstraint:
+            tableName: hr_termination_form
+            constraintName: uk_termination_form_no
+        - dropIndex:
+            tableName: hr_termination_form
+            indexName: idx_term_form_employee
+        - dropIndex:
+            tableName: hr_termination_form
+            indexName: idx_term_form_status
+
+  # ============================================================
+  # 04-21 — BizCode: add employee domain error codes (3xxx)
+  # ============================================================
+  # Note: BizCode constants are added in Java source, not in DB.
+  # This changeset is a placeholder comment for tracking.
+
+  # ============================================================
+  # 04-22 — seed approval definitions (HR_HIRE_FORM, HR_TRANSFER_FORM, HR_TERMINATION_FORM)
+  # ============================================================
+  - changeSet:
+      id: 04-22-seed-hr-approval-definitions
+      author: dev-be
+      comment: Seed HR approval definitions for hire/transfer/termination forms
+      changes:
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 200 }
+              - column: { name: code, value: HR_HIRE_FORM }
+              - column: { name: name, value: "Hire Form Approval" }
+              - column: { name: business_type, value: HR_HIRE }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"Admin审批","approverRule":"ROLE:ADMIN"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 201 }
+              - column: { name: code, value: HR_TRANSFER_FORM }
+              - column: { name: name, value: "Transfer Form Approval" }
+              - column: { name: business_type, value: HR_TRANSFER }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"直属经理审批","approverRule":"EMP_MANAGER"},{"seq":2,"name":"HR经理审批","approverRule":"ROLE:HR_MANAGER"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 202 }
+              - column: { name: code, value: HR_TERMINATION_FORM }
+              - column: { name: name, value: "Termination Form Approval" }
+              - column: { name: business_type, value: HR_TERMINATION }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"HR经理审批","approverRule":"ROLE:HR_MANAGER"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: approval_definition
+            where: "code IN ('HR_HIRE_FORM', 'HR_TRANSFER_FORM', 'HR_TERMINATION_FORM')"
+
+  # ============================================================
+  # 04-23 — seed HR permissions
+  # ============================================================
+  - changeSet:
+      id: 04-23-seed-hr-permissions
+      author: dev-be
+      comment: Seed HR employee permissions
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 2001 }
+              - column: { name: code, value: "hr:employee:view" }
+              - column: { name: name, value: "View employees" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 101 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 2002 }
+              - column: { name: code, value: "hr:employee:create" }
+              - column: { name: name, value: "Create employee" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 102 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 2003 }
+              - column: { name: code, value: "hr:employee:update" }
+              - column: { name: name, value: "Update employee" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 103 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 2004 }
+              - column: { name: code, value: "hr:employee:termination" }
+              - column: { name: name, value: "Terminate employee" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 104 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 2005 }
+              - column: { name: code, value: "hr:hire:submit" }
+              - column: { name: name, value: "Submit Hire Form" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 105 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 2006 }
+              - column: { name: code, value: "hr:transfer:submit" }
+              - column: { name: name, value: "Submit Transfer Form" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 106 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 2007 }
+              - column: { name: code, value: "hr:termination:submit" }
+              - column: { name: name, value: "Submit Termination Form" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 107 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "code LIKE 'hr:%'"
+
+  # ============================================================
+  # 04-24 — assign HR permissions to ADMIN role
+  # ============================================================
+  - changeSet:
+      id: 04-24-seed-hr-role-permission
+      author: dev-be
+      comment: Assign HR permissions to ADMIN role
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 70000, 100, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND code LIKE 'hr:%'
+      rollback:
+        - sql:
+            sql: >
+              DELETE FROM sys_role_permission
+              WHERE permission_id IN (SELECT id FROM sys_permission WHERE code LIKE 'hr:%')
+
+  # ============================================================
+  # 04-25 — seed 20 employees with sub-tables
+  # ============================================================
+  - changeSet:
+      id: 04-25-seed-employees
+      author: dev-be
+      comment: Seed 20 demo employees with sub-table data
+      changes:
+        # ---- employee 1: HR dept, HR专员 ----
+        - insert:
+            tableName: hr_employee
+            columns:
+              - column: { name: id, valueNumeric: 50001 }
+              - column: { name: emp_no, value: E000001 }
+              - column: { name: name, value: "张三" }
+              - column: { name: gender, value: M }
+              - column: { name: birth_date, value: "1990-01-15" }
+              - column: { name: id_card_enc, value: "encrypted_id_card_001" }
+              - column: { name: phone_enc, value: "encrypted_phone_001" }
+              - column: { name: email, value: "zhangsan@example.com" }
+              - column: { name: dept_id, valueNumeric: 201 }
+              - column: { name: position_id, valueNumeric: 401 }
+              - column: { name: hire_date, value: "2023-03-01" }
+              - column: { name: status, value: ACTIVE }
+              - column: { name: contract_start, value: "2023-03-01" }
+              - column: { name: contract_end, value: "2026-03-01" }
+              - column: { name: probation_end, value: "2023-06-01" }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: hr_employee_education
+            columns:
+              - column: { name: id, valueNumeric: 60001 }
+              - column: { name: employee_id, valueNumeric: 50001 }
+              - column: { name: school, value: "北京大学" }
+              - column: { name: degree, value: "本科" }
+              - column: { name: major, value: "人力资源管理" }
+              - column: { name: start_date, value: "2008-09-01" }
+              - column: { name: end_date, value: "2012-07-01" }
+              - column: { name: is_highest, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+        - insert:
+            tableName: hr_employee_bank_account
+            columns:
+              - column: { name: id, valueNumeric: 70001 }
+              - column: { name: employee_id, valueNumeric: 50001 }
+              - column: { name: bank_name, value: "中国工商银行" }
+              - column: { name: account_no_enc, value: "encrypted_acct_001" }
+              - column: { name: account_name, value: "张三" }
+              - column: { name: is_primary, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+        - insert:
+            tableName: hr_employee_address
+            columns:
+              - column: { name: id, valueNumeric: 80001 }
+              - column: { name: employee_id, valueNumeric: 50001 }
+              - column: { name: type, value: HOME }
+              - column: { name: province, value: "北京市" }
+              - column: { name: city, value: "北京市" }
+              - column: { name: district, value: "海淀区" }
+              - column: { name: detail, value: "中关村大街1号" }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+        - insert:
+            tableName: hr_employee_contract
+            columns:
+              - column: { name: id, valueNumeric: 90001 }
+              - column: { name: employee_id, valueNumeric: 50001 }
+              - column: { name: contract_no, value: CTR-2023-001 }
+              - column: { name: contract_type, value: FIXED }
+              - column: { name: start_date, value: "2023-03-01" }
+              - column: { name: end_date, value: "2026-03-01" }
+              - column: { name: signing_date, value: "2023-02-25" }
+              - column: { name: status, value: ACTIVE }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+        - insert:
+            tableName: hr_employee_family
+            columns:
+              - column: { name: id, valueNumeric: 100001 }
+              - column: { name: employee_id, valueNumeric: 50001 }
+              - column: { name: name, value: "张父" }
+              - column: { name: relationship, value: "父亲" }
+              - column: { name: phone_enc, value: "encrypted_family_phone_001" }
+              - column: { name: is_emergency, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+
+        # ---- employee 2: R&D dept, Java开发 ----
+        - insert:
+            tableName: hr_employee
+            columns:
+              - column: { name: id, valueNumeric: 50002 }
+              - column: { name: emp_no, value: E000002 }
+              - column: { name: name, value: "李四" }
+              - column: { name: gender, value: M }
+              - column: { name: birth_date, value: "1992-06-20" }
+              - column: { name: id_card_enc, value: "encrypted_id_card_002" }
+              - column: { name: phone_enc, value: "encrypted_phone_002" }
+              - column: { name: email, value: "lisi@example.com" }
+              - column: { name: dept_id, valueNumeric: 202 }
+              - column: { name: position_id, valueNumeric: 403 }
+              - column: { name: hire_date, value: "2023-04-15" }
+              - column: { name: status, value: ACTIVE }
+              - column: { name: contract_start, value: "2023-04-15" }
+              - column: { name: contract_end, value: "2026-04-15" }
+              - column: { name: probation_end, value: "2023-07-15" }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: hr_employee_education
+            columns:
+              - column: { name: id, valueNumeric: 60002 }
+              - column: { name: employee_id, valueNumeric: 50002 }
+              - column: { name: school, value: "清华大学" }
+              - column: { name: degree, value: "硕士" }
+              - column: { name: major, value: "计算机科学" }
+              - column: { name: start_date, value: "2010-09-01" }
+              - column: { name: end_date, value: "2013-07-01" }
+              - column: { name: is_highest, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+        - insert:
+            tableName: hr_employee_bank_account
+            columns:
+              - column: { name: id, valueNumeric: 70002 }
+              - column: { name: employee_id, valueNumeric: 50002 }
+              - column: { name: bank_name, value: "招商银行" }
+              - column: { name: account_no_enc, value: "encrypted_acct_002" }
+              - column: { name: account_name, value: "李四" }
+              - column: { name: is_primary, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+
+        # ---- employees 3-20: minimal seed rows ----
+        # We insert 18 more employees, each with basic education and bank sub-tables.
+        # Using bulk insert style for compactness.
+        - sql:
+            sql: >
+              INSERT INTO hr_employee (id, emp_no, name, gender, birth_date, id_card_enc, phone_enc, email, dept_id, position_id, hire_date, status, contract_start, contract_end, probation_end, deleted, version, tenant_id) VALUES
+              (50003, 'E000003', '王五', 'M', '1988-03-10', 'enc_id_003', 'enc_phone_003', 'wangwu@example.com', 202, 404, '2023-05-01', 'ACTIVE', '2023-05-01', '2026-05-01', '2023-08-01', false, 0, 1),
+              (50004, 'E000004', '赵六', 'F', '1995-11-22', 'enc_id_004', 'enc_phone_004', 'zhaoliu@example.com', 203, 405, '2023-06-01', 'ACTIVE', '2023-06-01', '2026-06-01', '2023-09-01', false, 0, 1),
+              (50005, 'E000005', '钱七', 'M', '1991-07-08', 'enc_id_005', 'enc_phone_005', 'qianqi@example.com', 204, 406, '2023-07-01', 'ACTIVE', '2023-07-01', '2026-07-01', '2023-10-01', false, 0, 1),
+              (50006, 'E000006', '孙八', 'F', '1993-09-15', 'enc_id_006', 'enc_phone_006', 'sunba@example.com', 201, 402, '2023-08-01', 'ACTIVE', '2023-08-01', '2026-08-01', '2023-11-01', false, 0, 1),
+              (50007, 'E000007', '周九', 'M', '1987-04-25', 'enc_id_007', 'enc_phone_007', 'zhoujiu@example.com', 205, NULL, '2023-09-01', 'ACTIVE', '2023-09-01', '2026-09-01', '2023-12-01', false, 0, 1),
+              (50008, 'E000008', '吴十', 'F', '1996-12-03', 'enc_id_008', 'enc_phone_008', 'wushi@example.com', 202, 403, '2023-10-01', 'PROBATION', '2023-10-01', '2026-10-01', '2024-01-01', false, 0, 1),
+              (50009, 'E000009', '郑十一', 'M', '1994-02-18', 'enc_id_009', 'enc_phone_009', 'zheng11@example.com', 203, 405, '2023-11-01', 'ACTIVE', '2023-11-01', '2026-11-01', '2024-02-01', false, 0, 1),
+              (50010, 'E000010', '冯十二', 'F', '1989-08-30', 'enc_id_010', 'enc_phone_010', 'feng12@example.com', 204, 406, '2023-12-01', 'ON_LEAVE', '2023-12-01', '2026-12-01', '2024-03-01', false, 0, 1),
+              (50011, 'E000011', '陈十三', 'M', '1990-05-12', 'enc_id_011', 'enc_phone_011', 'chen13@example.com', 202, 404, '2024-01-15', 'ACTIVE', '2024-01-15', '2027-01-15', '2024-04-15', false, 0, 1),
+              (50012, 'E000012', '褚十四', 'F', '1997-10-08', 'enc_id_012', 'enc_phone_012', 'chu14@example.com', 201, 401, '2024-02-01', 'PROBATION', '2024-02-01', '2027-02-01', '2024-05-01', false, 0, 1),
+              (50013, 'E000013', '卫十五', 'M', '1986-01-20', 'enc_id_013', 'enc_phone_013', 'wei15@example.com', 203, 405, '2024-03-01', 'ACTIVE', '2024-03-01', '2027-03-01', '2024-06-01', false, 0, 1),
+              (50014, 'E000014', '蒋十六', 'F', '1992-11-15', 'enc_id_014', 'enc_phone_014', 'jiang16@example.com', 205, NULL, '2024-04-01', 'ACTIVE', '2024-04-01', '2027-04-01', '2024-07-01', false, 0, 1),
+              (50015, 'E000015', '沈十七', 'M', '1993-06-28', 'enc_id_015', 'enc_phone_015', 'shen17@example.com', 202, 403, '2024-05-01', 'ACTIVE', '2024-05-01', '2027-05-01', '2024-08-01', false, 0, 1),
+              (50016, 'E000016', '韩十八', 'F', '1998-03-05', 'enc_id_016', 'enc_phone_016', 'han18@example.com', 204, 406, '2024-06-01', 'PROBATION', '2024-06-01', '2027-06-01', '2024-09-01', false, 0, 1),
+              (50017, 'E000017', '杨十九', 'M', '1991-09-10', 'enc_id_017', 'enc_phone_017', 'yang19@example.com', 201, 402, '2024-07-01', 'ACTIVE', '2024-07-01', '2027-07-01', '2024-10-01', false, 0, 1),
+              (50018, 'E000018', '朱二十', 'F', '1988-07-22', 'enc_id_018', 'enc_phone_018', 'zhu20@example.com', 203, 405, '2024-08-01', 'TERMINATED', '2024-08-01', '2027-08-01', '2024-11-01', false, 0, 1),
+              (50019, 'E000019', '秦廿一', 'M', '1995-04-18', 'enc_id_019', 'enc_phone_019', 'qin21@example.com', 202, 404, '2024-09-01', 'ACTIVE', '2024-09-01', '2027-09-01', '2024-12-01', false, 0, 1),
+              (50020, 'E000020', '尤廿二', 'F', '1990-12-01', 'enc_id_020', 'enc_phone_020', 'you22@example.com', 205, NULL, '2024-10-01', 'ACTIVE', '2024-10-01', '2027-10-01', '2025-01-01', false, 0, 1)
+      rollback:
+        - delete:
+            tableName: hr_employee
+            where: "emp_no LIKE 'E0%'"
+        - delete:
+            tableName: hr_employee_education
+            where: "employee_id BETWEEN 50001 AND 50020"
+        - delete:
+            tableName: hr_employee_bank_account
+            where: "employee_id BETWEEN 50001 AND 50020"
+        - delete:
+            tableName: hr_employee_address
+            where: "employee_id BETWEEN 50001 AND 50020"
+        - delete:
+            tableName: hr_employee_contract
+            where: "employee_id BETWEEN 50001 AND 50020"
+        - delete:
+            tableName: hr_employee_family
+            where: "employee_id BETWEEN 50001 AND 50020"

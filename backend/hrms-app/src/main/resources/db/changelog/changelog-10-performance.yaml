@@ -1,0 +1,712 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 10-01 — pf_cycle
+  # ============================================================
+  - changeSet:
+      id: 10-01-create-pf-cycle
+      author: dev-be
+      comment: Performance cycle table
+      changes:
+        - createTable:
+            tableName: pf_cycle
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column:
+                  name: start_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: end_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(10)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column:
+                  name: scope_type
+                  type: varchar(10)
+                  defaultValue: ALL
+                  constraints: { nullable: false }
+              - column:
+                  name: scope_depts
+                  type: text
+      rollback:
+        - dropTable:
+            tableName: pf_cycle
+
+  # ============================================================
+  # 10-02 — pf_template
+  # ============================================================
+  - changeSet:
+      id: 10-02-create-pf-template
+      author: dev-be
+      comment: Performance template table
+      changes:
+        - createTable:
+            tableName: pf_template
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column:
+                  name: description
+                  type: text
+      rollback:
+        - dropTable:
+            tableName: pf_template
+
+  # ============================================================
+  # 10-03 — pf_scoring_item
+  # ============================================================
+  - changeSet:
+      id: 10-03-create-pf-scoring-item
+      author: dev-be
+      comment: Performance scoring item table
+      changes:
+        - createTable:
+            tableName: pf_scoring_item
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: template_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints: { nullable: false }
+              - column:
+                  name: weight
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: min_score
+                  type: int
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: max_score
+                  type: int
+                  defaultValueNumeric: 5
+                  constraints: { nullable: false }
+              - column:
+                  name: sort_order
+                  type: int
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: pf_scoring_item
+
+  - changeSet:
+      id: 10-04-pf-scoring-item-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: pf_scoring_item
+            indexName: idx_scoring_item_template
+            columns:
+              - column: { name: template_id }
+      rollback:
+        - dropIndex:
+            tableName: pf_scoring_item
+            indexName: idx_scoring_item_template
+
+  # ============================================================
+  # 10-05 — pf_appraisal
+  # ============================================================
+  - changeSet:
+      id: 10-05-create-pf-appraisal
+      author: dev-be
+      comment: Performance appraisal table
+      changes:
+        - createTable:
+            tableName: pf_appraisal
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: cycle_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: template_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column:
+                  name: self_score
+                  type: "decimal(5,2)"
+              - column:
+                  name: manager_score
+                  type: "decimal(5,2)"
+              - column:
+                  name: final_score
+                  type: "decimal(5,2)"
+      rollback:
+        - dropTable:
+            tableName: pf_appraisal
+
+  - changeSet:
+      id: 10-06-pf-appraisal-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: pf_appraisal
+            indexName: idx_appraisal_cycle
+            columns:
+              - column: { name: cycle_id }
+        - createIndex:
+            tableName: pf_appraisal
+            indexName: idx_appraisal_emp
+            columns:
+              - column: { name: employee_id }
+        - addUniqueConstraint:
+            tableName: pf_appraisal
+            columnNames: cycle_id, employee_id, tenant_id
+            constraintName: uk_appraisal_cycle_emp
+      rollback:
+        - dropIndex:
+            tableName: pf_appraisal
+            indexName: idx_appraisal_cycle
+        - dropIndex:
+            tableName: pf_appraisal
+            indexName: idx_appraisal_emp
+        - dropUniqueConstraint:
+            tableName: pf_appraisal
+            constraintName: uk_appraisal_cycle_emp
+
+  # ============================================================
+  # 10-07 — pf_goal
+  # ============================================================
+  - changeSet:
+      id: 10-07-create-pf-goal
+      author: dev-be
+      comment: Performance goal table
+      changes:
+        - createTable:
+            tableName: pf_goal
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: appraisal_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: weight
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(10)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column:
+                  name: sort_order
+                  type: int
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: pf_goal
+
+  - changeSet:
+      id: 10-08-pf-goal-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: pf_goal
+            indexName: idx_goal_appraisal
+            columns:
+              - column: { name: appraisal_id }
+      rollback:
+        - dropIndex:
+            tableName: pf_goal
+            indexName: idx_goal_appraisal
+
+  # ============================================================
+  # 10-09 — pf_self_review
+  # ============================================================
+  - changeSet:
+      id: 10-09-create-pf-self-review
+      author: dev-be
+      comment: Performance self-review table
+      changes:
+        - createTable:
+            tableName: pf_self_review
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: appraisal_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: scoring_item_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: score
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: comment
+                  type: text
+      rollback:
+        - dropTable:
+            tableName: pf_self_review
+
+  - changeSet:
+      id: 10-10-pf-self-review-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: pf_self_review
+            indexName: idx_self_review_appraisal
+            columns:
+              - column: { name: appraisal_id }
+      rollback:
+        - dropIndex:
+            tableName: pf_self_review
+            indexName: idx_self_review_appraisal
+
+  # ============================================================
+  # 10-11 — pf_manager_review
+  # ============================================================
+  - changeSet:
+      id: 10-11-create-pf-manager-review
+      author: dev-be
+      comment: Performance manager review table
+      changes:
+        - createTable:
+            tableName: pf_manager_review
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: appraisal_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: scoring_item_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: score
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: comment
+                  type: text
+      rollback:
+        - dropTable:
+            tableName: pf_manager_review
+
+  - changeSet:
+      id: 10-12-pf-manager-review-index
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: pf_manager_review
+            indexName: idx_manager_review_appraisal
+            columns:
+              - column: { name: appraisal_id }
+      rollback:
+        - dropIndex:
+            tableName: pf_manager_review
+            indexName: idx_manager_review_appraisal
+
+  # ============================================================
+  # 10-13 — Seed standard performance template
+  # ============================================================
+  - changeSet:
+      id: 10-13-seed-pf-template
+      author: dev-be
+      comment: Seed standard performance template with 3 scoring items
+      context: seed
+      changes:
+        - insert:
+            tableName: pf_template
+            columns:
+              - column: { name: id, valueNumeric: 901 }
+              - column: { name: name, value: "标准绩效模板" }
+              - column: { name: description, value: "适用于全公司员工的标准绩效评估模板" }
+        - insert:
+            tableName: pf_scoring_item
+            columns:
+              - column: { name: id, valueNumeric: 911 }
+              - column: { name: template_id, valueNumeric: 901 }
+              - column: { name: name, value: "工作质量" }
+              - column: { name: weight, valueNumeric: 40 }
+              - column: { name: min_score, valueNumeric: 1 }
+              - column: { name: max_score, valueNumeric: 5 }
+              - column: { name: sort_order, valueNumeric: 1 }
+        - insert:
+            tableName: pf_scoring_item
+            columns:
+              - column: { name: id, valueNumeric: 912 }
+              - column: { name: template_id, valueNumeric: 901 }
+              - column: { name: name, value: "团队协作" }
+              - column: { name: weight, valueNumeric: 30 }
+              - column: { name: min_score, valueNumeric: 1 }
+              - column: { name: max_score, valueNumeric: 5 }
+              - column: { name: sort_order, valueNumeric: 2 }
+        - insert:
+            tableName: pf_scoring_item
+            columns:
+              - column: { name: id, valueNumeric: 913 }
+              - column: { name: template_id, valueNumeric: 901 }
+              - column: { name: name, value: "创新能力" }
+              - column: { name: weight, valueNumeric: 30 }
+              - column: { name: min_score, valueNumeric: 1 }
+              - column: { name: max_score, valueNumeric: 5 }
+              - column: { name: sort_order, valueNumeric: 3 }
+      rollback:
+        - delete:
+            tableName: pf_scoring_item
+            where: "id BETWEEN 911 AND 913"
+        - delete:
+            tableName: pf_template
+            where: "id = 901"
+
+  # ============================================================
+  # 10-14 — Seed performance permissions
+  # ============================================================
+  - changeSet:
+      id: 10-14-seed-pf-permissions
+      author: dev-be
+      comment: Insert performance module permissions
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 921 }
+              - column: { name: code, value: "pf:cycle:edit" }
+              - column: { name: name, value: "编辑绩效周期" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 922 }
+              - column: { name: code, value: "pf:cycle:list" }
+              - column: { name: name, value: "查看绩效周期" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 923 }
+              - column: { name: code, value: "pf:template:edit" }
+              - column: { name: name, value: "编辑绩效模板" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 924 }
+              - column: { name: code, value: "pf:template:list" }
+              - column: { name: name, value: "查看绩效模板" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 925 }
+              - column: { name: code, value: "pf:appraisal:list" }
+              - column: { name: name, value: "查看绩效单" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 926 }
+              - column: { name: code, value: "pf:goal:edit" }
+              - column: { name: name, value: "编辑绩效目标" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 927 }
+              - column: { name: code, value: "pf:review:self" }
+              - column: { name: name, value: "提交自评" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 928 }
+              - column: { name: code, value: "pf:review:manager" }
+              - column: { name: name, value: "提交上级评分" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 929 }
+              - column: { name: code, value: "pf:appraisal:finalize" }
+              - column: { name: name, value: "完成绩效评估" }
+              - column: { name: type, value: "button" }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 921 AND 929"
+
+  # ============================================================
+  # 10-15 — Map performance permissions to ADMIN role
+  # ============================================================
+  - changeSet:
+      id: 10-15-seed-admin-role-pf-permissions
+      author: dev-be
+      comment: Map performance permissions to ADMIN role
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90037 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 921 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90038 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 922 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90039 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 923 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90040 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 924 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90041 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 925 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90042 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 926 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90043 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 927 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90044 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 928 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90045 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 929 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 921 AND 929"

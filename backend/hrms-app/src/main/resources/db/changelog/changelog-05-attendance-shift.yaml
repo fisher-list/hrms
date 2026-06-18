@@ -1,0 +1,508 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 05-01 — at_shift (Shift template)
+  # ============================================================
+  - changeSet:
+      id: 05-01-create-at-shift
+      author: dev-be
+      comment: Shift template table
+      changes:
+        - createTable:
+            tableName: at_shift
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: shift_name
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column:
+                  name: start_time
+                  type: varchar(5)
+                  constraints: { nullable: false }
+              - column:
+                  name: end_time
+                  type: varchar(5)
+                  constraints: { nullable: false }
+              - column:
+                  name: flex_minutes
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: is_night_shift
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: remark
+                  type: varchar(200)
+      rollback:
+        - dropTable:
+            tableName: at_shift
+
+  # ============================================================
+  # 05-02 — at_schedule (Schedule assignment)
+  # ============================================================
+  - changeSet:
+      id: 05-02-create-at-schedule
+      author: dev-be
+      comment: Schedule assignment table
+      changes:
+        - createTable:
+            tableName: at_schedule
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: schedule_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: shift_id
+                  type: bigint
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: at_schedule
+
+  - changeSet:
+      id: 05-03-at-schedule-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: at_schedule
+            columnNames: employee_id, schedule_date, tenant_id
+            constraintName: uk_schedule_emp_date
+        - createIndex:
+            tableName: at_schedule
+            indexName: idx_schedule_shift
+            columns:
+              - column: { name: shift_id }
+      rollback:
+        - dropUniqueConstraint:
+            tableName: at_schedule
+            constraintName: uk_schedule_emp_date
+        - dropIndex:
+            tableName: at_schedule
+            indexName: idx_schedule_shift
+
+  # ============================================================
+  # 05-04 — at_time_punch (Time punch records)
+  # ============================================================
+  - changeSet:
+      id: 05-04-create-at-time-punch
+      author: dev-be
+      comment: Time punch records table
+      changes:
+        - createTable:
+            tableName: at_time_punch
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: punch_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: clock_in
+                  type: varchar(5)
+              - column:
+                  name: clock_out
+                  type: varchar(5)
+              - column:
+                  name: source
+                  type: varchar(10)
+                  defaultValue: MANUAL
+      rollback:
+        - dropTable:
+            tableName: at_time_punch
+
+  - changeSet:
+      id: 05-05-at-time-punch-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: at_time_punch
+            indexName: idx_punch_employee_date
+            columns:
+              - column: { name: employee_id }
+              - column: { name: punch_date }
+      rollback:
+        - dropIndex:
+            tableName: at_time_punch
+            indexName: idx_punch_employee_date
+
+  # ============================================================
+  # 05-06 — at_daily_summary (Daily attendance summary)
+  # ============================================================
+  - changeSet:
+      id: 05-06-create-at-daily-summary
+      author: dev-be
+      comment: Daily attendance summary table
+      changes:
+        - createTable:
+            tableName: at_daily_summary
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: summary_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: scheduled
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: attended
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: late_minutes
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: early_leave_minutes
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: absent
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: overtime_hours
+                  type: "decimal(5,1)"
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: at_daily_summary
+
+  - changeSet:
+      id: 05-07-at-daily-summary-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: at_daily_summary
+            columnNames: employee_id, summary_date, tenant_id
+            constraintName: uk_summary_emp_date
+      rollback:
+        - dropUniqueConstraint:
+            tableName: at_daily_summary
+            constraintName: uk_summary_emp_date
+
+  # ============================================================
+  # 05-08 — Seed data: default shifts
+  # ============================================================
+  - changeSet:
+      id: 05-08-seed-shifts
+      author: dev-be
+      comment: Insert default shift templates
+      context: seed
+      changes:
+        - insert:
+            tableName: at_shift
+            columns:
+              - column: { name: id, valueNumeric: 5001 }
+              - column: { name: shift_name, value: "朝九晚六" }
+              - column: { name: start_time, value: "09:00" }
+              - column: { name: end_time, value: "18:00" }
+              - column: { name: flex_minutes, valueNumeric: 10 }
+              - column: { name: is_night_shift, valueBoolean: false }
+              - column: { name: remark, value: "Standard 9-6 shift with 10min flex" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_shift
+            columns:
+              - column: { name: id, valueNumeric: 5002 }
+              - column: { name: shift_name, value: "弹性班" }
+              - column: { name: start_time, value: "09:00" }
+              - column: { name: end_time, value: "18:00" }
+              - column: { name: flex_minutes, valueNumeric: 60 }
+              - column: { name: is_night_shift, valueBoolean: false }
+              - column: { name: remark, value: "Flexible shift with 60min flex" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: at_shift
+            where: "id IN (5001, 5002)"
+
+  # ============================================================
+  # 05-09 — Seed data: attendance permissions
+  # ============================================================
+  - changeSet:
+      id: 05-09-seed-attendance-permissions
+      author: dev-be
+      comment: Insert attendance module permissions
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 501 }
+              - column: { name: code, value: "at:shift:list" }
+              - column: { name: name, value: "查看班次" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 502 }
+              - column: { name: code, value: "at:shift:edit" }
+              - column: { name: name, value: "编辑班次" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 503 }
+              - column: { name: code, value: "at:schedule:list" }
+              - column: { name: name, value: "查看排班" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 504 }
+              - column: { name: code, value: "at:schedule:edit" }
+              - column: { name: name, value: "编辑排班" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 505 }
+              - column: { name: code, value: "at:punch:list" }
+              - column: { name: name, value: "查看打卡" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 506 }
+              - column: { name: code, value: "at:punch:import" }
+              - column: { name: name, value: "导入打卡" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 507 }
+              - column: { name: code, value: "at:summary:list" }
+              - column: { name: name, value: "查看考勤汇总" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 508 }
+              - column: { name: code, value: "at:summary:generate" }
+              - column: { name: name, value: "生成考勤汇总" }
+              - column: { name: type, value: "button" }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 501 AND 508"
+
+  # ============================================================
+  # 05-10 — Seed data: map permissions to ADMIN role
+  # ============================================================
+  - changeSet:
+      id: 05-10-seed-admin-role-permissions
+      author: dev-be
+      comment: Map attendance permissions to ADMIN role
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90000 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 501 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90001 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 502 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90002 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 503 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90003 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 504 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90004 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 505 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90005 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 506 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90006 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 507 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90007 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 508 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 501 AND 508"
+
+  # ============================================================
+  # 05-11 — Seed data: schedule first 10 employees
+  # ============================================================
+  - changeSet:
+      id: 05-11-seed-schedule-first-10-employees
+      author: dev-be
+      comment: Schedule first 10 employees to standard shift for 2026-06-01 to 2026-06-15
+      context: seed
+      dbms: postgresql
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO at_schedule (id, employee_id, schedule_date, shift_id, created_at, version, deleted, tenant_id)
+              SELECT
+                (50000 + e.id * 100 + d.day_offset) AS id,
+                e.id AS employee_id,
+                DATE '2026-06-01' + d.day_offset AS schedule_date,
+                5001 AS shift_id,
+                NOW() AS created_at,
+                0 AS version,
+                false AS deleted,
+                1 AS tenant_id
+              FROM (
+                SELECT id FROM hr_employee WHERE deleted = false ORDER BY id LIMIT 10
+              ) e
+              CROSS JOIN (
+                SELECT generate_series(0, 14) AS day_offset
+              ) d
+              ON CONFLICT DO NOTHING
+      rollback:
+        - sql:
+            sql: "DELETE FROM at_schedule WHERE shift_id = 5001 AND schedule_date BETWEEN '2026-06-01' AND '2026-06-15'"

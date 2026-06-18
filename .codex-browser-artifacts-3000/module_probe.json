@@ -1,0 +1,448 @@
+{
+  "login": {
+    "wait_error": "Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"re.compile('.*/dashboard.*')\" until 'load'\n============================================================",
+    "url": "http://localhost:3000/login",
+    "text": "HRMS 登录\n用户名\n密码\n登录",
+    "net": [
+      {
+        "url": "http://localhost:3000/src/api/auth.ts",
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "url": "http://localhost:3000/src/api/role.ts",
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "url": "http://localhost:3000/src/api/http.ts",
+        "status": 200,
+        "method": "GET"
+      },
+      {
+        "url": "http://localhost:3000/api/auth/login",
+        "status": 200,
+        "method": "POST"
+      },
+      {
+        "url": "http://localhost:3000/api/me/permissions",
+        "status": 200,
+        "method": "GET"
+      }
+    ],
+    "console": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      }
+    ],
+    "page_errors": []
+  },
+  "routes": [
+    {
+      "name": "dashboard",
+      "path": "/dashboard",
+      "url": "http://localhost:3000/dashboard",
+      "title": "HRMS",
+      "text_excerpt": "HRMS Dashboard\n欢迎,admin\n退出登录\n\n选择一个自助门户进入：\n\n员工自助 (ESS)\n经理自助 (MSS)\n组织树\n员工档案\n请假申请\n薪酬批次\n招聘 Offer\n绩效评审\n角色管理",
+      "text_len": 102,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        }
+      ],
+      "console": [],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/dashboard.png"
+    },
+    {
+      "name": "org-tree",
+      "path": "/org/tree",
+      "url": "http://localhost:3000/org/tree",
+      "title": "HRMS",
+      "text_excerpt": "",
+      "text_len": 0,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        },
+        {
+          "url": "http://localhost:3000/api/me/permissions",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "console": [
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: uncaught error during route navigation:"
+        },
+        {
+          "type": "error",
+          "text": "TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        },
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: Unexpected error when starting the router: TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        }
+      ],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/org-tree.png"
+    },
+    {
+      "name": "employees",
+      "path": "/hr/employees",
+      "url": "http://localhost:3000/hr/employees",
+      "title": "HRMS",
+      "text_excerpt": "",
+      "text_len": 0,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        },
+        {
+          "url": "http://localhost:3000/api/me/permissions",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "console": [
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: uncaught error during route navigation:"
+        },
+        {
+          "type": "error",
+          "text": "TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        },
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: Unexpected error when starting the router: TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        }
+      ],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/employees.png"
+    },
+    {
+      "name": "leave-create",
+      "path": "/attendance/leave/new",
+      "url": "http://localhost:3000/attendance/leave/new",
+      "title": "HRMS",
+      "text_excerpt": "",
+      "text_len": 0,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        },
+        {
+          "url": "http://localhost:3000/api/me/permissions",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "console": [
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: uncaught error during route navigation:"
+        },
+        {
+          "type": "error",
+          "text": "TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        },
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: Unexpected error when starting the router: TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        }
+      ],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/leave-create.png"
+    },
+    {
+      "name": "payroll-runs",
+      "path": "/payroll/runs",
+      "url": "http://localhost:3000/payroll/runs",
+      "title": "HRMS",
+      "text_excerpt": "",
+      "text_len": 0,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        },
+        {
+          "url": "http://localhost:3000/api/me/permissions",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "console": [
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: uncaught error during route navigation:"
+        },
+        {
+          "type": "error",
+          "text": "TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        },
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: Unexpected error when starting the router: TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        }
+      ],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/payroll-runs.png"
+    },
+    {
+      "name": "recruit-offers",
+      "path": "/recruit/offers",
+      "url": "http://localhost:3000/recruit/offers",
+      "title": "HRMS",
+      "text_excerpt": "",
+      "text_len": 0,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        },
+        {
+          "url": "http://localhost:3000/api/me/permissions",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "console": [
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: uncaught error during route navigation:"
+        },
+        {
+          "type": "error",
+          "text": "TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        },
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: Unexpected error when starting the router: TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        }
+      ],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/recruit-offers.png"
+    },
+    {
+      "name": "performance-reviews",
+      "path": "/performance/reviews",
+      "url": "http://localhost:3000/performance/reviews",
+      "title": "HRMS",
+      "text_excerpt": "",
+      "text_len": 0,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        },
+        {
+          "url": "http://localhost:3000/api/me/permissions",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "console": [
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: uncaught error during route navigation:"
+        },
+        {
+          "type": "error",
+          "text": "TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        },
+        {
+          "type": "warning",
+          "text": "[Vue Router warn]: Unexpected error when starting the router: TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at new Set (<anonymous>)\n    at Proxy.fetchPermissions (http://localhost:3000/src/store/permission.ts:10:21)\n    at async http://localhost:3000/src/router/index.ts:111:7"
+        }
+      ],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/performance-reviews.png"
+    },
+    {
+      "name": "ess",
+      "path": "/portal/ess",
+      "url": "http://localhost:3000/portal/ess",
+      "title": "HRMS",
+      "text_excerpt": "",
+      "text_len": 0,
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/api/auth/refresh",
+          "status": 200,
+          "method": "POST"
+        }
+      ],
+      "console": [],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/ess.png"
+    },
+    {
+      "name": "mss",
+      "path": "/portal/mss",
+      "error": "Page.goto: net::ERR_ABORTED at http://localhost:3000/portal/mss\nCall log:\n  - navigating to \"http://localhost:3000/portal/mss\", waiting until \"domcontentloaded\"\n",
+      "url": "http://localhost:3000/portal/ess",
+      "text_excerpt": "",
+      "api_calls": [
+        {
+          "url": "http://localhost:3000/src/api/portal.ts",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/auth.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/role.ts",
+          "status": 304,
+          "method": "GET"
+        },
+        {
+          "url": "http://localhost:3000/src/api/http.ts",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "console": [],
+      "page_errors": [],
+      "screenshot": "/Users/apple/hrms/.codex-browser-artifacts-3000/probe/mss_exception.png"
+    }
+  ],
+  "started_at": "2026-06-18 06:56:44"
+}

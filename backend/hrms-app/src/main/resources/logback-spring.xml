@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  HRMS structured logging configuration.
+
+  Profiles:
+    dev  – coloured human-readable console output (default)
+    prod – JSON console output for container / aggregator consumption
+
+  Environment overrides:
+    LOG_LEVEL         – root log level (default INFO)
+    LOG_FILE_PATH     – log file directory (default /var/log/hrms)
+    LOG_FILE_MAX_SIZE – max file size before rolling (default 100MB)
+    LOG_FILE_MAX_HISTORY – days to keep rolled files (default 30)
+-->
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- ────────────── properties ────────────── -->
+    <property name="APP_NAME" value="hrms"/>
+    <property name="LOG_FILE_PATH"   value="${LOG_FILE_PATH:-/var/log/hrms}"/>
+    <property name="LOG_FILE_MAX_SIZE"    value="${LOG_FILE_MAX_SIZE:-100MB}"/>
+    <property name="LOG_FILE_MAX_HISTORY" value="${LOG_FILE_MAX_HISTORY:-30}"/>
+    <property name="LOG_LEVEL_ROOT"  value="${LOG_LEVEL:-INFO}"/>
+
+    <!-- ────────────── CONSOLE APPENDER ────────────── -->
+
+    <!-- dev: coloured pattern -->
+    <appender name="CONSOLE_DEV" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+        <encoder>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5level) %clr(%-40.40logger{39}){cyan} [%thread] %clr(:){faint} %msg%n%rEx</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- prod: JSON format (uses our custom JsonLayout) -->
+    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.hrms.app.logging.JsonLayout">
+                <appenderName>${APP_NAME}</appenderName>
+            </layout>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ────────────── FILE APPENDER (always active) ────────────── -->
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE_PATH}/${APP_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.hrms.app.logging.JsonLayout">
+                <appenderName>${APP_NAME}</appenderName>
+            </layout>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ────────────── ERROR FILE APPENDER ────────────── -->
+
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE_PATH}/${APP_NAME}-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE_PATH}/${APP_NAME}-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.hrms.app.logging.JsonLayout">
+                <appenderName>${APP_NAME}</appenderName>
+            </layout>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ────────────── ACCESS LOG (HTTP requests) ────────────── -->
+    <!--
+    <appender name="ACCESS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE_PATH}/${APP_NAME}-access.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE_PATH}/${APP_NAME}-access.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.hrms.app.logging.JsonLayout">
+                <appenderName>${APP_NAME}-access</appenderName>
+            </layout>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    -->
+
+    <!-- ────────────── SPRING-SPECIFIC PROFILES ────────────── -->
+
+    <!-- dev profile: coloured console + file -->
+    <springProfile name="dev">
+        <root level="${LOG_LEVEL_ROOT}">
+            <appender-ref ref="CONSOLE_DEV"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- prod / staging: JSON console + file -->
+    <springProfile name="!dev">
+        <root level="${LOG_LEVEL_ROOT}">
+            <appender-ref ref="CONSOLE_JSON"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- ────────────── LOGGER LEVELS ────────────── -->
+
+    <logger name="com.hrms" level="${LOG_LEVEL_ROOT:-INFO}"/>
+
+    <!-- Spring Security: noisy at INFO, keep WARN -->
+    <logger name="org.springframework.security" level="WARN"/>
+
+    <!-- Reduce framework chatter -->
+    <logger name="org.springframework.web"       level="INFO"/>
+    <logger name="org.springframework.boot"      level="INFO"/>
+    <logger name="org.hibernate.SQL"             level="WARN"/>
+    <logger name="com.zaxxer.hikari"             level="WARN"/>
+    <logger name="liquibase"                     level="WARN"/>
+    <logger name="org.apache.ibatis"             level="WARN"/>
+
+</configuration>

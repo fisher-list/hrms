@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: hrms-test
+  datasource:
+    url: jdbc:h2:mem:hrms_integration_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+  liquibase:
+    enabled: false
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: Asia/Shanghai
+
+server:
+  port: 0
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: true
+      logic-not-delete-value: false
+  configuration:
+    map-underscore-to-camel-case: true
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+hrms:
+  jwt:
+    secret: "0123456789abcdef0123456789abcdef0123456789abcdef"
+    access-ttl: PT30M
+    refresh-ttl: P7D
+    issuer: hrms
+    refresh-cookie-secure: false
+  cors:
+    allowed-origins: "http://localhost:3000"
+  snowflake:
+    worker-id: 1
+    datacenter-id: 1
+  security:
+    hsts-enabled: false

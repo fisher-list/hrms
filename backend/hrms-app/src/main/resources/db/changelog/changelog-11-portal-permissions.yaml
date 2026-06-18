@@ -1,0 +1,69 @@
+databaseChangeLog:
+  # ============================================================
+  # 11-01 — ESS/MSS portal permissions
+  # ============================================================
+  - changeSet:
+      id: 11-01-seed-portal-permissions
+      author: dev-be
+      comment: Insert ESS/MSS portal permissions and assign mss:* to ADMIN role
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 951 }
+              - column: { name: code, value: "mss:team:list" }
+              - column: { name: name, value: "查看下属团队" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 952 }
+              - column: { name: code, value: "mss:leave:list" }
+              - column: { name: name, value: "查看下属请假" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 953 }
+              - column: { name: code, value: "mss:todo:list" }
+              - column: { name: name, value: "查看待审批" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 954 }
+              - column: { name: code, value: "mss:approval:act" }
+              - column: { name: name, value: "执行审批动作" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90046 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 951 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90047 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 952 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90048 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 953 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90049 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 954 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 951 AND 954"
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 951 AND 954"

@@ -1,0 +1,136 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 07-01 — at_settlement_batch (Year-end settlement batch)
+  # ============================================================
+  - changeSet:
+      id: 07-01-create-at-settlement-batch
+      author: dev-be
+      comment: Year-end settlement batch table
+      changes:
+        - createTable:
+            tableName: at_settlement_batch
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: settlement_year
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+              - column:
+                  name: processed_count
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_carryover_days
+                  type: "decimal(8,1)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_expired_days
+                  type: "decimal(8,1)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: started_at
+                  type: datetime
+              - column:
+                  name: completed_at
+                  type: datetime
+      rollback:
+        - dropTable:
+            tableName: at_settlement_batch
+
+  - changeSet:
+      id: 07-02-at-settlement-batch-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: at_settlement_batch
+            columnNames: settlement_year, tenant_id
+            constraintName: uk_settlement_year
+      rollback:
+        - dropUniqueConstraint:
+            tableName: at_settlement_batch
+            constraintName: uk_settlement_year
+
+  # ============================================================
+  # 07-03 — Seed settlement permissions
+  # ============================================================
+  - changeSet:
+      id: 07-03-seed-settlement-permissions
+      author: dev-be
+      comment: Insert settlement module permissions
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 701 }
+              - column: { name: code, value: "at:settlement:run" }
+              - column: { name: name, value: "执行年度结算" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 702 }
+              - column: { name: code, value: "at:settlement:list" }
+              - column: { name: name, value: "查看结算批次" }
+              - column: { name: type, value: "button" }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 701 AND 702"
+
+  # ============================================================
+  # 07-04 — Map settlement permissions to ADMIN role
+  # ============================================================
+  - changeSet:
+      id: 07-04-seed-admin-role-settlement-permissions
+      author: dev-be
+      comment: Map settlement permissions to ADMIN role
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90015 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 701 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90016 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 702 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 701 AND 702"

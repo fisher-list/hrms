@@ -1,0 +1,650 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 09-01 — rc_job_requisition
+  # ============================================================
+  - changeSet:
+      id: 09-01-create-rc-job-requisition
+      author: dev-be
+      comment: Job requisition table
+      changes:
+        - createTable:
+            tableName: rc_job_requisition
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: position_id
+                  type: bigint
+              - column:
+                  name: title
+                  type: varchar(100)
+                  constraints: { nullable: false }
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: headcount
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: deadline
+                  type: date
+              - column:
+                  name: status
+                  type: varchar(10)
+                  defaultValue: OPEN
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: rc_job_requisition
+
+  # ============================================================
+  # 09-02 — rc_candidate
+  # ============================================================
+  - changeSet:
+      id: 09-02-create-rc-candidate
+      author: dev-be
+      comment: Candidate table
+      changes:
+        - createTable:
+            tableName: rc_candidate
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column:
+                  name: phone
+                  type: varchar(20)
+              - column:
+                  name: email
+                  type: varchar(100)
+              - column:
+                  name: id_card_enc
+                  type: text
+              - column:
+                  name: expected_salary
+                  type: "decimal(18,4)"
+              - column:
+                  name: current_status
+                  type: varchar(20)
+                  defaultValue: NEW
+                  constraints: { nullable: false }
+              - column:
+                  name: job_requisition_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: rc_candidate
+
+  - changeSet:
+      id: 09-03-rc-candidate-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: rc_candidate
+            indexName: idx_candidate_requisition
+            columns:
+              - column: { name: job_requisition_id }
+      rollback:
+        - dropIndex:
+            tableName: rc_candidate
+            indexName: idx_candidate_requisition
+
+  - changeSet:
+      id: 09-13-add-rc-candidate-id-card-hash
+      author: codex
+      comment: Add keyed hash for candidate ID card duplicate checks
+      changes:
+        - addColumn:
+            tableName: rc_candidate
+            columns:
+              - column:
+                  name: id_card_hash
+                  type: varchar(64)
+        - createIndex:
+            tableName: rc_candidate
+            indexName: idx_candidate_id_card_hash
+            columns:
+              - column: { name: id_card_hash }
+      rollback:
+        - dropIndex:
+            tableName: rc_candidate
+            indexName: idx_candidate_id_card_hash
+        - dropColumn:
+            tableName: rc_candidate
+            columnName: id_card_hash
+
+  # ============================================================
+  # 09-04 — rc_interview
+  # ============================================================
+  - changeSet:
+      id: 09-04-create-rc-interview
+      author: dev-be
+      comment: Interview schedule table
+      changes:
+        - createTable:
+            tableName: rc_interview
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: candidate_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: round_no
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: interviewer_user_id
+                  type: bigint
+              - column:
+                  name: interview_time
+                  type: datetime
+              - column:
+                  name: location
+                  type: varchar(100)
+              - column:
+                  name: result
+                  type: varchar(10)
+                  defaultValue: PENDING
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: rc_interview
+
+  - changeSet:
+      id: 09-05-rc-interview-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: rc_interview
+            indexName: idx_interview_candidate
+            columns:
+              - column: { name: candidate_id }
+      rollback:
+        - dropIndex:
+            tableName: rc_interview
+            indexName: idx_interview_candidate
+
+  # ============================================================
+  # 09-06 — rc_evaluation
+  # ============================================================
+  - changeSet:
+      id: 09-06-create-rc-evaluation
+      author: dev-be
+      comment: Interview evaluation table (append-only)
+      changes:
+        - createTable:
+            tableName: rc_evaluation
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: interview_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: score
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: pass_flag
+                  type: boolean
+                  constraints: { nullable: false }
+              - column:
+                  name: comment
+                  type: text
+              - column:
+                  name: evaluator_user_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: rc_evaluation
+
+  - changeSet:
+      id: 09-07-rc-evaluation-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: rc_evaluation
+            indexName: idx_evaluation_interview
+            columns:
+              - column: { name: interview_id }
+      rollback:
+        - dropIndex:
+            tableName: rc_evaluation
+            indexName: idx_evaluation_interview
+
+  # ============================================================
+  # 09-08 — rc_offer
+  # ============================================================
+  - changeSet:
+      id: 09-08-create-rc-offer
+      author: dev-be
+      comment: Offer table
+      changes:
+        - createTable:
+            tableName: rc_offer
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: candidate_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: job_requisition_id
+                  type: bigint
+              - column:
+                  name: salary
+                  type: "decimal(18,4)"
+              - column:
+                  name: onboard_date
+                  type: date
+              - column:
+                  name: status
+                  type: varchar(15)
+                  defaultValue: DRAFT
+                  constraints: { nullable: false }
+              - column:
+                  name: approval_instance_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: rc_offer
+
+  - changeSet:
+      id: 09-09-rc-offer-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: rc_offer
+            indexName: idx_offer_candidate
+            columns:
+              - column: { name: candidate_id }
+        - createIndex:
+            tableName: rc_offer
+            indexName: idx_offer_approval
+            columns:
+              - column: { name: approval_instance_id }
+      rollback:
+        - dropIndex:
+            tableName: rc_offer
+            indexName: idx_offer_candidate
+        - dropIndex:
+            tableName: rc_offer
+            indexName: idx_offer_approval
+
+  # ============================================================
+  # 09-10 — rc_candidate_status_log
+  # ============================================================
+  - changeSet:
+      id: 09-10-create-rc-candidate-status-log
+      author: dev-be
+      comment: Candidate status change log
+      changes:
+        - createTable:
+            tableName: rc_candidate_status_log
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: candidate_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: old_status
+                  type: varchar(20)
+              - column:
+                  name: new_status
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: remark
+                  type: varchar(255)
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+      rollback:
+        - dropTable:
+            tableName: rc_candidate_status_log
+
+  - changeSet:
+      id: 09-11-rc-candidate-status-log-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: rc_candidate_status_log
+            indexName: idx_status_log_candidate
+            columns:
+              - column: { name: candidate_id }
+      rollback:
+        - dropIndex:
+            tableName: rc_candidate_status_log
+            indexName: idx_status_log_candidate
+
+  # ============================================================
+  # 09-12 — Seed approval definition RC_OFFER_APPROVAL
+  # ============================================================
+  - changeSet:
+      id: 09-12-seed-approval-definition
+      author: dev-be
+      comment: Seed RC_OFFER_APPROVAL approval definition
+      context: seed
+      changes:
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 9001 }
+              - column: { name: code, value: "RC_OFFER_APPROVAL" }
+              - column: { name: name, value: "Offer审批" }
+              - column: { name: business_type, value: "RC_OFFER_APPROVAL" }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"HR Manager审批","approverRule":"ROLE:ADMIN"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: approval_definition
+            where: "code = 'RC_OFFER_APPROVAL'"
+
+  # ============================================================
+  # 09-13 — Seed recruitment permissions
+  # ============================================================
+  - changeSet:
+      id: 09-13-seed-recruit-permissions
+      author: dev-be
+      comment: Insert recruitment module permissions
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 901 }
+              - column: { name: code, value: "rc:requisition:edit" }
+              - column: { name: name, value: "编辑职位需求" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 902 }
+              - column: { name: code, value: "rc:requisition:list" }
+              - column: { name: name, value: "查看职位需求" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 903 }
+              - column: { name: code, value: "rc:candidate:edit" }
+              - column: { name: name, value: "编辑候选人" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 904 }
+              - column: { name: code, value: "rc:candidate:list" }
+              - column: { name: name, value: "查看候选人" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 905 }
+              - column: { name: code, value: "rc:interview:edit" }
+              - column: { name: name, value: "编辑面试安排" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 906 }
+              - column: { name: code, value: "rc:interview:list" }
+              - column: { name: name, value: "查看面试安排" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 907 }
+              - column: { name: code, value: "rc:evaluation:edit" }
+              - column: { name: name, value: "编辑面试评价" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 908 }
+              - column: { name: code, value: "rc:offer:edit" }
+              - column: { name: name, value: "编辑Offer" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 909 }
+              - column: { name: code, value: "rc:offer:list" }
+              - column: { name: name, value: "查看Offer" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 910 }
+              - column: { name: code, value: "rc:offer:accept" }
+              - column: { name: name, value: "接受/拒绝Offer" }
+              - column: { name: type, value: "button" }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 901 AND 910"
+
+  # ============================================================
+  # 09-14 — Map recruitment permissions to ADMIN role
+  # ============================================================
+  - changeSet:
+      id: 09-14-seed-admin-role-recruit-permissions
+      author: dev-be
+      comment: Map recruitment permissions to ADMIN role
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90027 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 901 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90028 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 902 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90029 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 903 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90030 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 904 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90031 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 905 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90032 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 906 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90033 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 907 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90034 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 908 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90035 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 909 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90036 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 910 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 901 AND 910"

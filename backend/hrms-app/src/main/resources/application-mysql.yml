@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${HRMS_DB_URL:jdbc:mysql://localhost:3306/hrms?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&characterEncoding=utf8mb4}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${HRMS_DB_USERNAME:hrms}
+    password: ${HRMS_DB_PASSWORD:hrms}

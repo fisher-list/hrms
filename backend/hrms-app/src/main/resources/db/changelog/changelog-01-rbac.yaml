@@ -1,0 +1,709 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 01-01 — sys_role table
+  # ============================================================
+  - changeSet:
+      id: 01-01-create-sys-role
+      author: dev-be
+      comment: RBAC role table
+      changes:
+        - createTable:
+            tableName: sys_role
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints: { nullable: false }
+              - column: { name: description, type: varchar(256) }
+              - column:
+                  name: builtin
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: sys_role
+
+  - changeSet:
+      id: 01-02-sys-role-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: sys_role
+            columnNames: code
+            constraintName: uk_role_code
+      rollback:
+        - dropUniqueConstraint:
+            tableName: sys_role
+            constraintName: uk_role_code
+
+  # ============================================================
+  # 01-03 — sys_permission table
+  # ============================================================
+  - changeSet:
+      id: 01-03-create-sys-permission
+      author: dev-be
+      comment: RBAC permission table
+      changes:
+        - createTable:
+            tableName: sys_permission
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: code
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column:
+                  name: type
+                  type: varchar(16)
+                  constraints: { nullable: false }
+              - column: { name: parent_id, type: bigint }
+              - column:
+                  name: sort_no
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: sys_permission
+
+  - changeSet:
+      id: 01-04-sys-permission-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: sys_permission
+            columnNames: code
+            constraintName: uk_permission_code
+      rollback:
+        - dropUniqueConstraint:
+            tableName: sys_permission
+            constraintName: uk_permission_code
+
+  # ============================================================
+  # 01-05 — sys_user_role table
+  # ============================================================
+  - changeSet:
+      id: 01-05-create-sys-user-role
+      author: dev-be
+      comment: User-role association table
+      changes:
+        - createTable:
+            tableName: sys_user_role
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: sys_user_role
+
+  - changeSet:
+      id: 01-06-sys-user-role-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: sys_user_role
+            columnNames: user_id, role_id
+            constraintName: uk_user_role
+      rollback:
+        - dropUniqueConstraint:
+            tableName: sys_user_role
+            constraintName: uk_user_role
+
+  # ============================================================
+  # 01-07 — sys_role_permission table
+  # ============================================================
+  - changeSet:
+      id: 01-07-create-sys-role-permission
+      author: dev-be
+      comment: Role-permission association table
+      changes:
+        - createTable:
+            tableName: sys_role_permission
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: permission_id
+                  type: bigint
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: sys_role_permission
+
+  - changeSet:
+      id: 01-08-sys-role-permission-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: sys_role_permission
+            columnNames: role_id, permission_id
+            constraintName: uk_role_permission
+      rollback:
+        - dropUniqueConstraint:
+            tableName: sys_role_permission
+            constraintName: uk_role_permission
+
+  # ============================================================
+  # 01-09 — seed roles
+  # ============================================================
+  - changeSet:
+      id: 01-09-seed-roles
+      author: dev-be
+      comment: Seed 4 builtin roles
+      changes:
+        - insert:
+            tableName: sys_role
+            columns:
+              - column: { name: id, valueNumeric: 100 }
+              - column: { name: code, value: ADMIN }
+              - column: { name: name, value: 系统管理员 }
+              - column: { name: description, value: Super administrator with all permissions }
+              - column: { name: builtin, valueBoolean: true }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_role
+            columns:
+              - column: { name: id, valueNumeric: 101 }
+              - column: { name: code, value: HR_MANAGER }
+              - column: { name: name, value: HR经理 }
+              - column: { name: description, value: HR manager with employee/org/attendance/payroll access }
+              - column: { name: builtin, valueBoolean: true }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_role
+            columns:
+              - column: { name: id, valueNumeric: 102 }
+              - column: { name: code, value: LINE_MANAGER }
+              - column: { name: name, value: 直线经理 }
+              - column: { name: description, value: Line manager with limited employee view and attendance approval }
+              - column: { name: builtin, valueBoolean: true }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_role
+            columns:
+              - column: { name: id, valueNumeric: 103 }
+              - column: { name: code, value: EMPLOYEE }
+              - column: { name: name, value: 普通员工 }
+              - column: { name: description, value: Regular employee with basic self-service access }
+              - column: { name: builtin, valueBoolean: true }
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: sys_role
+            where: code IN ('ADMIN', 'HR_MANAGER', 'LINE_MANAGER', 'EMPLOYEE')
+
+  # ============================================================
+  # 01-10 — seed permissions (20 permission codes)
+  # ============================================================
+  - changeSet:
+      id: 01-10-seed-permissions
+      author: dev-be
+      comment: Seed all permission codes from PRD section 3
+      changes:
+        # employee permissions
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1000 }
+              - column: { name: code, value: "employee:view" }
+              - column: { name: name, value: "View employees" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 1 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1001 }
+              - column: { name: code, value: "employee:create" }
+              - column: { name: name, value: "Create employees" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 2 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1002 }
+              - column: { name: code, value: "employee:edit" }
+              - column: { name: name, value: "Edit employees" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 3 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1003 }
+              - column: { name: code, value: "employee:delete" }
+              - column: { name: name, value: "Delete employees" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 4 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # org permissions
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1010 }
+              - column: { name: code, value: "org:view" }
+              - column: { name: name, value: "View org structure" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 10 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1011 }
+              - column: { name: code, value: "org:create" }
+              - column: { name: name, value: "Create departments" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 11 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1012 }
+              - column: { name: code, value: "org:edit" }
+              - column: { name: name, value: "Edit departments" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 12 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1013 }
+              - column: { name: code, value: "org:delete" }
+              - column: { name: name, value: "Delete departments" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 13 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # role permissions
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1020 }
+              - column: { name: code, value: "role:view" }
+              - column: { name: name, value: "View roles" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 20 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1021 }
+              - column: { name: code, value: "role:create" }
+              - column: { name: name, value: "Create roles" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 21 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1022 }
+              - column: { name: code, value: "role:edit" }
+              - column: { name: name, value: "Edit roles" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 22 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1023 }
+              - column: { name: code, value: "role:delete" }
+              - column: { name: name, value: "Delete roles" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 23 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # attendance permissions
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1030 }
+              - column: { name: code, value: "attendance:view" }
+              - column: { name: name, value: "View attendance" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 30 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1031 }
+              - column: { name: code, value: "attendance:edit" }
+              - column: { name: name, value: "Edit attendance" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 31 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1032 }
+              - column: { name: code, value: "attendance:approve" }
+              - column: { name: name, value: "Approve attendance" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 32 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # payroll permissions
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1040 }
+              - column: { name: code, value: "payroll:view" }
+              - column: { name: name, value: "View payroll" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 40 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1041 }
+              - column: { name: code, value: "payroll:edit" }
+              - column: { name: name, value: "Edit payroll" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 41 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # recruit permissions
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1050 }
+              - column: { name: code, value: "recruit:view" }
+              - column: { name: name, value: "View recruitment" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 50 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1051 }
+              - column: { name: code, value: "recruit:edit" }
+              - column: { name: name, value: "Edit recruitment" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 51 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # performance permissions
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1060 }
+              - column: { name: code, value: "performance:view" }
+              - column: { name: name, value: "View performance" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 60 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 1061 }
+              - column: { name: code, value: "performance:edit" }
+              - column: { name: name, value: "Edit performance" }
+              - column: { name: type, value: API }
+              - column: { name: sort_no, valueNumeric: 61 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "code LIKE 'employee:%' OR code LIKE 'org:%' OR code LIKE 'role:%' OR code LIKE 'attendance:%' OR code LIKE 'payroll:%' OR code LIKE 'recruit:%' OR code LIKE 'performance:%'"
+
+  # ============================================================
+  # 01-11 — seed admin user-role (admin id=1, ADMIN role id=100)
+  # ============================================================
+  - changeSet:
+      id: 01-11-seed-admin-user-role
+      author: dev-be
+      comment: Assign ADMIN role to admin user
+      changes:
+        - insert:
+            tableName: sys_user_role
+            columns:
+              - column: { name: id, valueNumeric: 10000 }
+              - column: { name: user_id, valueNumeric: 1 }
+              - column: { name: role_id, valueNumeric: 100 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: sys_user_role
+            where: user_id = 1 AND role_id = 100
+
+  # ============================================================
+  # 01-12 — seed role-permission mappings
+  # ADMIN (100) gets ALL permissions
+  # HR_MANAGER (101) gets employee:*, org:view, attendance:*, payroll:*
+  # LINE_MANAGER (102) gets employee:view, attendance:view, attendance:approve
+  # EMPLOYEE (103) gets attendance:view
+  # ============================================================
+  - changeSet:
+      id: 01-12-seed-role-permission
+      author: dev-be
+      comment: Seed role-permission mappings
+      changes:
+        # ADMIN -> all permissions (1000-1061)
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 20000, 100, id, false, 0, 1
+              FROM sys_permission WHERE deleted = false
+        # HR_MANAGER -> employee:*, org:view, attendance:*, payroll:*
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 30000, 101, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND (
+                code LIKE 'employee:%'
+                OR code = 'org:view'
+                OR code LIKE 'attendance:%'
+                OR code LIKE 'payroll:%'
+              )
+        # LINE_MANAGER -> employee:view, attendance:view, attendance:approve
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 40000, 102, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND code IN ('employee:view', 'attendance:view', 'attendance:approve')
+        # EMPLOYEE -> attendance:view
+        - sql:
+            sql: >
+              INSERT INTO sys_role_permission (id, role_id, permission_id, deleted, version, tenant_id)
+              SELECT id + 50000, 103, id, false, 0, 1
+              FROM sys_permission
+              WHERE deleted = false AND code = 'attendance:view'
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: role_id IN (100, 101, 102, 103)
+
+  # ============================================================
+  # 01-13 — add data_scope column to sys_role
+  # ============================================================
+  - changeSet:
+      id: 01-13-add-data-scope-column
+      author: dev-be
+      comment: Add data_scope column to sys_role for row-level data filtering
+      changes:
+        - addColumn:
+            tableName: sys_role
+            columns:
+              - column:
+                  name: data_scope
+                  type: varchar(32)
+                  defaultValue: SELF_ONLY
+                  constraints: { nullable: false }
+      rollback:
+        - dropColumn:
+            tableName: sys_role
+            columnName: data_scope
+
+  # ============================================================
+  # 01-14 — set data_scope for builtin roles
+  # ============================================================
+  - changeSet:
+      id: 01-14-seed-role-data-scope
+      author: dev-be
+      comment: Set data_scope for builtin roles
+      changes:
+        - update:
+            tableName: sys_role
+            columns:
+              - column: { name: data_scope, value: ALL }
+            where: code = 'ADMIN'
+        - update:
+            tableName: sys_role
+            columns:
+              - column: { name: data_scope, value: ALL }
+            where: code = 'HR_MANAGER'
+        - update:
+            tableName: sys_role
+            columns:
+              - column: { name: data_scope, value: SUBORDINATE_TREE }
+            where: code = 'LINE_MANAGER'
+        - update:
+            tableName: sys_role
+            columns:
+              - column: { name: data_scope, value: SELF_ONLY }
+            where: code = 'EMPLOYEE'
+      rollback:
+        - update:
+            tableName: sys_role
+            columns:
+              - column: { name: data_scope, value: SELF_ONLY }
+            where: code IN ('ADMIN', 'HR_MANAGER', 'LINE_MANAGER', 'EMPLOYEE')

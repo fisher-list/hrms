@@ -1,0 +1,44 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Node
+node_modules/
+dist/
+.nuxt/
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Docker
+.docker/
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Coverage
+jacoco.exec
+coverage/

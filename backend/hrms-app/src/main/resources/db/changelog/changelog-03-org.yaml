@@ -1,0 +1,567 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 03-01 — company table
+  # ============================================================
+  - changeSet:
+      id: 03-01-create-company
+      author: dev-be
+      comment: Company table
+      changes:
+        - createTable:
+            tableName: company
+            columns:
+              # BaseEntity columns
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column: { name: legal_representative, type: varchar(64) }
+              - column: { name: address, type: varchar(256) }
+              - column: { name: phone, type: varchar(32) }
+              - column: { name: email, type: varchar(128) }
+      rollback:
+        - dropTable:
+            tableName: company
+
+  - changeSet:
+      id: 03-02-company-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: company
+            columnNames: code
+            constraintName: uk_company_code
+      rollback:
+        - dropUniqueConstraint:
+            tableName: company
+            constraintName: uk_company_code
+
+  # ============================================================
+  # 03-03 — department table
+  # ============================================================
+  - changeSet:
+      id: 03-03-create-department
+      author: dev-be
+      comment: Department table
+      changes:
+        - createTable:
+            tableName: department
+            columns:
+              # BaseEntity columns
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: company_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column: { name: parent_id, type: bigint }
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints: { nullable: false }
+              - column: { name: path, type: varchar(512) }
+              - column: { name: level, type: int }
+              - column: { name: head_id, type: bigint }
+              - column:
+                  name: sort_no
+                  type: int
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: department
+
+  - changeSet:
+      id: 03-04-department-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: department
+            indexName: idx_dept_company
+            columns:
+              - column: { name: company_id }
+        - createIndex:
+            tableName: department
+            indexName: idx_dept_parent
+            columns:
+              - column: { name: parent_id }
+        - createIndex:
+            tableName: department
+            indexName: idx_dept_path
+            columns:
+              - column: { name: path }
+      rollback:
+        - dropIndex:
+            tableName: department
+            indexName: idx_dept_path
+        - dropIndex:
+            tableName: department
+            indexName: idx_dept_parent
+        - dropIndex:
+            tableName: department
+            indexName: idx_dept_company
+
+  # ============================================================
+  # 03-05 — job table
+  # ============================================================
+  - changeSet:
+      id: 03-05-create-job
+      author: dev-be
+      comment: Job (grade/sequence) table
+      changes:
+        - createTable:
+            tableName: job
+            columns:
+              # BaseEntity columns
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column:
+                  name: sequence
+                  type: varchar(16)
+                  constraints: { nullable: false }
+              - column:
+                  name: grade
+                  type: int
+                  constraints: { nullable: false }
+              - column: { name: min_salary, type: "decimal(18,4)" }
+              - column: { name: max_salary, type: "decimal(18,4)" }
+      rollback:
+        - dropTable:
+            tableName: job
+
+  - changeSet:
+      id: 03-06-job-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: job
+            columnNames: code
+            constraintName: uk_job_code
+      rollback:
+        - dropUniqueConstraint:
+            tableName: job
+            constraintName: uk_job_code
+
+  # ============================================================
+  # 03-07 — position table
+  # ============================================================
+  - changeSet:
+      id: 03-07-create-position
+      author: dev-be
+      comment: Position table
+      changes:
+        - createTable:
+            tableName: position
+            columns:
+              # BaseEntity columns
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: dept_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: job_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints: { nullable: false }
+              - column: { name: code, type: varchar(64) }
+              - column:
+                  name: headcount
+                  type: int
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              - column:
+                  name: occupied
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+      rollback:
+        - dropTable:
+            tableName: position
+
+  - changeSet:
+      id: 03-08-position-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: position
+            indexName: idx_pos_dept
+            columns:
+              - column: { name: dept_id }
+        - createIndex:
+            tableName: position
+            indexName: idx_pos_job
+            columns:
+              - column: { name: job_id }
+      rollback:
+        - dropIndex:
+            tableName: position
+            indexName: idx_pos_job
+        - dropIndex:
+            tableName: position
+            indexName: idx_pos_dept
+
+  # ============================================================
+  # 03-09 — seed company
+  # ============================================================
+  - changeSet:
+      id: 03-09-seed-company
+      author: dev-be
+      comment: Seed default company
+      changes:
+        - insert:
+            tableName: company
+            columns:
+              - column: { name: id, valueNumeric: 100 }
+              - column: { name: code, value: ZK_GROUP }
+              - column: { name: name, value: "智科集团" }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: company
+            where: id = 100
+
+  # ============================================================
+  # 03-10 — seed departments (5 top-level)
+  # ============================================================
+  - changeSet:
+      id: 03-10-seed-departments
+      author: dev-be
+      comment: Seed 5 departments for company 100
+      changes:
+        - insert:
+            tableName: department
+            columns:
+              - column: { name: id, valueNumeric: 201 }
+              - column: { name: company_id, valueNumeric: 100 }
+              - column: { name: name, value: "人力资源部" }
+              - column: { name: code, value: HR }
+              - column: { name: path, value: "/201" }
+              - column: { name: level, valueNumeric: 1 }
+              - column: { name: sort_no, valueNumeric: 1 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: department
+            columns:
+              - column: { name: id, valueNumeric: 202 }
+              - column: { name: company_id, valueNumeric: 100 }
+              - column: { name: name, value: "研发部" }
+              - column: { name: code, value: RD }
+              - column: { name: path, value: "/202" }
+              - column: { name: level, valueNumeric: 1 }
+              - column: { name: sort_no, valueNumeric: 2 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: department
+            columns:
+              - column: { name: id, valueNumeric: 203 }
+              - column: { name: company_id, valueNumeric: 100 }
+              - column: { name: name, value: "销售部" }
+              - column: { name: code, value: SALES }
+              - column: { name: path, value: "/203" }
+              - column: { name: level, valueNumeric: 1 }
+              - column: { name: sort_no, valueNumeric: 3 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: department
+            columns:
+              - column: { name: id, valueNumeric: 204 }
+              - column: { name: company_id, valueNumeric: 100 }
+              - column: { name: name, value: "产品部" }
+              - column: { name: code, value: PRODUCT }
+              - column: { name: path, value: "/204" }
+              - column: { name: level, valueNumeric: 1 }
+              - column: { name: sort_no, valueNumeric: 4 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: department
+            columns:
+              - column: { name: id, valueNumeric: 205 }
+              - column: { name: company_id, valueNumeric: 100 }
+              - column: { name: name, value: "财务部" }
+              - column: { name: code, value: FINANCE }
+              - column: { name: path, value: "/205" }
+              - column: { name: level, valueNumeric: 1 }
+              - column: { name: sort_no, valueNumeric: 5 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: department
+            where: company_id = 100
+
+  # ============================================================
+  # 03-11 — seed job sequences (M/P/T)
+  # ============================================================
+  - changeSet:
+      id: 03-11-seed-jobs
+      author: dev-be
+      comment: Seed 3 job sequences
+      changes:
+        - insert:
+            tableName: job
+            columns:
+              - column: { name: id, valueNumeric: 301 }
+              - column: { name: code, value: M1 }
+              - column: { name: name, value: "管理序列L1" }
+              - column: { name: sequence, value: M }
+              - column: { name: grade, valueNumeric: 1 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: job
+            columns:
+              - column: { name: id, valueNumeric: 302 }
+              - column: { name: code, value: P1 }
+              - column: { name: name, value: "专业序列P1" }
+              - column: { name: sequence, value: P }
+              - column: { name: grade, valueNumeric: 1 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: job
+            columns:
+              - column: { name: id, valueNumeric: 303 }
+              - column: { name: code, value: T1 }
+              - column: { name: name, value: "技术序列T1" }
+              - column: { name: sequence, value: T }
+              - column: { name: grade, valueNumeric: 1 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: job
+            where: code IN ('M1', 'P1', 'T1')
+
+  # ============================================================
+  # 03-12 — seed positions (6 positions)
+  # ============================================================
+  - changeSet:
+      id: 03-12-seed-positions
+      author: dev-be
+      comment: Seed 6 positions
+      changes:
+        # HR专员: dept=HR(201), job=P1(302)
+        - insert:
+            tableName: position
+            columns:
+              - column: { name: id, valueNumeric: 401 }
+              - column: { name: dept_id, valueNumeric: 201 }
+              - column: { name: job_id, valueNumeric: 302 }
+              - column: { name: name, value: "HR专员" }
+              - column: { name: code, value: POS-HR-01 }
+              - column: { name: headcount, valueNumeric: 1 }
+              - column: { name: occupied, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # 招聘经理: dept=HR(201), job=M1(301)
+        - insert:
+            tableName: position
+            columns:
+              - column: { name: id, valueNumeric: 402 }
+              - column: { name: dept_id, valueNumeric: 201 }
+              - column: { name: job_id, valueNumeric: 301 }
+              - column: { name: name, value: "招聘经理" }
+              - column: { name: code, value: POS-HR-02 }
+              - column: { name: headcount, valueNumeric: 1 }
+              - column: { name: occupied, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # Java开发: dept=研发(202), job=T1(303)
+        - insert:
+            tableName: position
+            columns:
+              - column: { name: id, valueNumeric: 403 }
+              - column: { name: dept_id, valueNumeric: 202 }
+              - column: { name: job_id, valueNumeric: 303 }
+              - column: { name: name, value: "Java开发" }
+              - column: { name: code, value: POS-RD-01 }
+              - column: { name: headcount, valueNumeric: 1 }
+              - column: { name: occupied, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # 前端开发: dept=研发(202), job=T1(303)
+        - insert:
+            tableName: position
+            columns:
+              - column: { name: id, valueNumeric: 404 }
+              - column: { name: dept_id, valueNumeric: 202 }
+              - column: { name: job_id, valueNumeric: 303 }
+              - column: { name: name, value: "前端开发" }
+              - column: { name: code, value: POS-RD-02 }
+              - column: { name: headcount, valueNumeric: 1 }
+              - column: { name: occupied, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # 销售代表: dept=销售(203), job=P1(302)
+        - insert:
+            tableName: position
+            columns:
+              - column: { name: id, valueNumeric: 405 }
+              - column: { name: dept_id, valueNumeric: 203 }
+              - column: { name: job_id, valueNumeric: 302 }
+              - column: { name: name, value: "销售代表" }
+              - column: { name: code, value: POS-SALES-01 }
+              - column: { name: headcount, valueNumeric: 1 }
+              - column: { name: occupied, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        # 产品经理: dept=产品(204), job=P1(302)
+        - insert:
+            tableName: position
+            columns:
+              - column: { name: id, valueNumeric: 406 }
+              - column: { name: dept_id, valueNumeric: 204 }
+              - column: { name: job_id, valueNumeric: 302 }
+              - column: { name: name, value: "产品经理" }
+              - column: { name: code, value: POS-PROD-01 }
+              - column: { name: headcount, valueNumeric: 1 }
+              - column: { name: occupied, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: position
+            where: "code LIKE 'POS-%'"

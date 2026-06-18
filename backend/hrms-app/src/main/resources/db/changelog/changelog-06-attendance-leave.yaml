@@ -1,0 +1,718 @@
+databaseChangeLog:
+
+  # ============================================================
+  # 06-01 — at_leave_type (Leave type catalog)
+  # ============================================================
+  - changeSet:
+      id: 06-01-create-at-leave-type
+      author: dev-be
+      comment: Leave type catalog table
+      changes:
+        - createTable:
+            tableName: at_leave_type
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: code
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints: { nullable: false }
+              - column:
+                  name: is_paid
+                  type: boolean
+                  defaultValueBoolean: true
+              - column:
+                  name: annual_quota
+                  type: "decimal(5,1)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: balance_unit
+                  type: varchar(10)
+                  defaultValue: DAY
+              - column:
+                  name: carry_over_rule
+                  type: varchar(20)
+                  defaultValue: NONE
+      rollback:
+        - dropTable:
+            tableName: at_leave_type
+
+  - changeSet:
+      id: 06-02-at-leave-type-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: at_leave_type
+            columnNames: code, tenant_id
+            constraintName: uk_leave_type_code
+      rollback:
+        - dropUniqueConstraint:
+            tableName: at_leave_type
+            constraintName: uk_leave_type_code
+
+  # ============================================================
+  # 06-03 — at_leave_balance (Leave balance)
+  # ============================================================
+  - changeSet:
+      id: 06-03-create-at-leave-balance
+      author: dev-be
+      comment: Leave balance table
+      changes:
+        - createTable:
+            tableName: at_leave_balance
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: leave_type_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: year
+                  type: int
+                  constraints: { nullable: false }
+              - column:
+                  name: quota
+                  type: "decimal(5,1)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: used
+                  type: "decimal(5,1)"
+                  defaultValueNumeric: 0
+              - column:
+                  name: remaining
+                  type: "decimal(5,1)"
+                  defaultValueNumeric: 0
+      rollback:
+        - dropTable:
+            tableName: at_leave_balance
+
+  - changeSet:
+      id: 06-04-at-leave-balance-indexes
+      author: dev-be
+      changes:
+        - addUniqueConstraint:
+            tableName: at_leave_balance
+            columnNames: employee_id, leave_type_id, year, tenant_id
+            constraintName: uk_balance_emp_type_year
+      rollback:
+        - dropUniqueConstraint:
+            tableName: at_leave_balance
+            constraintName: uk_balance_emp_type_year
+
+  # ============================================================
+  # 06-05 — at_leave_request (Leave request)
+  # ============================================================
+  - changeSet:
+      id: 06-05-create-at-leave-request
+      author: dev-be
+      comment: Leave request table
+      changes:
+        - createTable:
+            tableName: at_leave_request
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: leave_type_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: start_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: end_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: days
+                  type: "decimal(4,1)"
+                  constraints: { nullable: false }
+              - column:
+                  name: reason
+                  type: varchar(500)
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+              - column:
+                  name: approval_instance_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: at_leave_request
+
+  - changeSet:
+      id: 06-06-at-leave-request-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: at_leave_request
+            indexName: idx_leave_req_employee
+            columns:
+              - column: { name: employee_id }
+              - column: { name: status }
+        - createIndex:
+            tableName: at_leave_request
+            indexName: idx_leave_req_dates
+            columns:
+              - column: { name: employee_id }
+              - column: { name: start_date }
+              - column: { name: end_date }
+      rollback:
+        - dropIndex:
+            tableName: at_leave_request
+            indexName: idx_leave_req_employee
+        - dropIndex:
+            tableName: at_leave_request
+            indexName: idx_leave_req_dates
+
+  # ============================================================
+  # 06-07 — at_overtime_request (Overtime request)
+  # ============================================================
+  - changeSet:
+      id: 06-07-create-at-overtime-request
+      author: dev-be
+      comment: Overtime request table
+      changes:
+        - createTable:
+            tableName: at_overtime_request
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: updated_at, type: datetime }
+              - column: { name: created_by, type: bigint }
+              - column: { name: updated_by, type: bigint }
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints: { nullable: false }
+              - column:
+                  name: version
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints: { nullable: false }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+                  constraints: { nullable: false }
+              # domain columns
+              - column:
+                  name: employee_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: overtime_date
+                  type: date
+                  constraints: { nullable: false }
+              - column:
+                  name: hours
+                  type: "decimal(4,1)"
+                  constraints: { nullable: false }
+              - column:
+                  name: reason
+                  type: varchar(500)
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: PENDING
+              - column:
+                  name: approval_instance_id
+                  type: bigint
+      rollback:
+        - dropTable:
+            tableName: at_overtime_request
+
+  - changeSet:
+      id: 06-08-at-overtime-request-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: at_overtime_request
+            indexName: idx_overtime_req_employee
+            columns:
+              - column: { name: employee_id }
+              - column: { name: status }
+      rollback:
+        - dropIndex:
+            tableName: at_overtime_request
+            indexName: idx_overtime_req_employee
+
+  # ============================================================
+  # 06-09 — at_leave_balance_log (Balance change log)
+  # ============================================================
+  - changeSet:
+      id: 06-09-create-at-leave-balance-log
+      author: dev-be
+      comment: Leave balance change log table
+      changes:
+        - createTable:
+            tableName: at_leave_balance_log
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: balance_id
+                  type: bigint
+                  constraints: { nullable: false }
+              - column:
+                  name: change_type
+                  type: varchar(20)
+                  constraints: { nullable: false }
+              - column:
+                  name: change_value
+                  type: "decimal(5,1)"
+                  constraints: { nullable: false }
+              - column:
+                  name: related_request_id
+                  type: bigint
+              - column:
+                  name: remark
+                  type: varchar(200)
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column: { name: created_by, type: bigint }
+              - column:
+                  name: tenant_id
+                  type: bigint
+                  defaultValueNumeric: 1
+      rollback:
+        - dropTable:
+            tableName: at_leave_balance_log
+
+  - changeSet:
+      id: 06-10-at-leave-balance-log-indexes
+      author: dev-be
+      changes:
+        - createIndex:
+            tableName: at_leave_balance_log
+            indexName: idx_balance_log_balance
+            columns:
+              - column: { name: balance_id }
+      rollback:
+        - dropIndex:
+            tableName: at_leave_balance_log
+            indexName: idx_balance_log_balance
+
+  # ============================================================
+  # 06-11 — Seed 8 leave types
+  # ============================================================
+  - changeSet:
+      id: 06-11-seed-leave-types
+      author: dev-be
+      comment: Insert 8 default leave types
+      context: seed
+      changes:
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6001 }
+              - column: { name: code, value: "ANNUAL" }
+              - column: { name: name, value: "年假" }
+              - column: { name: is_paid, valueBoolean: true }
+              - column: { name: annual_quota, valueNumeric: 20 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "CARRY_MAX5" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6002 }
+              - column: { name: code, value: "SICK" }
+              - column: { name: name, value: "病假" }
+              - column: { name: is_paid, valueBoolean: true }
+              - column: { name: annual_quota, valueNumeric: 15 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "NONE" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6003 }
+              - column: { name: code, value: "PERSONAL" }
+              - column: { name: name, value: "事假" }
+              - column: { name: is_paid, valueBoolean: false }
+              - column: { name: annual_quota, valueNumeric: 10 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "NONE" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6004 }
+              - column: { name: code, value: "MARRIAGE" }
+              - column: { name: name, value: "婚假" }
+              - column: { name: is_paid, valueBoolean: true }
+              - column: { name: annual_quota, valueNumeric: 3 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "NONE" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6005 }
+              - column: { name: code, value: "MATERNITY" }
+              - column: { name: name, value: "产假" }
+              - column: { name: is_paid, valueBoolean: true }
+              - column: { name: annual_quota, valueNumeric: 158 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "NONE" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6006 }
+              - column: { name: code, value: "PATERNITY" }
+              - column: { name: name, value: "陪产假" }
+              - column: { name: is_paid, valueBoolean: true }
+              - column: { name: annual_quota, valueNumeric: 15 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "NONE" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6007 }
+              - column: { name: code, value: "BEREAVEMENT" }
+              - column: { name: name, value: "丧假" }
+              - column: { name: is_paid, valueBoolean: true }
+              - column: { name: annual_quota, valueNumeric: 3 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "NONE" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: at_leave_type
+            columns:
+              - column: { name: id, valueNumeric: 6008 }
+              - column: { name: code, value: "COMPOFF" }
+              - column: { name: name, value: "调休" }
+              - column: { name: is_paid, valueBoolean: true }
+              - column: { name: annual_quota, valueNumeric: 0 }
+              - column: { name: balance_unit, value: "DAY" }
+              - column: { name: carry_over_rule, value: "EXPIRE_2M" }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: at_leave_type
+            where: "id BETWEEN 6001 AND 6008"
+
+  # ============================================================
+  # 06-12 — Seed initial leave balances for 20 employees (year 2026)
+  # Uses SQL to insert ANNUAL(20), SICK(15), PERSONAL(10) for all 20 employees
+  # ============================================================
+  - changeSet:
+      id: 06-12-seed-leave-balances
+      author: dev-be
+      comment: Seed initial leave balances for 20 employees for year 2026
+      context: seed
+      dbms: postgresql
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO at_leave_balance (id, employee_id, leave_type_id, year, quota, used, remaining, created_at, version, deleted, tenant_id)
+              SELECT
+                (61000 + (e.id - 50000) * 10 + lt.offset) AS id,
+                e.id AS employee_id,
+                lt.type_id AS leave_type_id,
+                2026 AS year,
+                lt.quota AS quota,
+                0 AS used,
+                lt.quota AS remaining,
+                NOW() AS created_at,
+                0 AS version,
+                false AS deleted,
+                1 AS tenant_id
+              FROM (
+                SELECT id FROM hr_employee WHERE deleted = false AND id BETWEEN 50001 AND 50020
+              ) e
+              CROSS JOIN (
+                SELECT 6001 AS type_id, 1 AS offset, 20.0 AS quota UNION ALL
+                SELECT 6002, 2, 15.0 UNION ALL
+                SELECT 6003, 3, 10.0 UNION ALL
+                SELECT 6004, 4, 0.0 UNION ALL
+                SELECT 6005, 5, 0.0 UNION ALL
+                SELECT 6006, 6, 0.0 UNION ALL
+                SELECT 6007, 7, 0.0 UNION ALL
+                SELECT 6008, 8, 0.0
+              ) lt
+              ON CONFLICT DO NOTHING
+      rollback:
+        - sql:
+            sql: "DELETE FROM at_leave_balance WHERE year = 2026 AND employee_id BETWEEN 50001 AND 50020"
+
+  # ============================================================
+  # 06-13 — Seed approval definitions for leave and overtime
+  # ============================================================
+  - changeSet:
+      id: 06-13-seed-approval-definitions
+      author: dev-be
+      comment: Seed AT_LEAVE_REQUEST and AT_OVERTIME_REQUEST approval definitions
+      context: seed
+      changes:
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 6001 }
+              - column: { name: code, value: "AT_LEAVE_REQUEST" }
+              - column: { name: name, value: "请假审批" }
+              - column: { name: business_type, value: "AT_LEAVE_REQUEST" }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"管理员审批","approverRule":"ROLE:ADMIN"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+        - insert:
+            tableName: approval_definition
+            columns:
+              - column: { name: id, valueNumeric: 6002 }
+              - column: { name: code, value: "AT_OVERTIME_REQUEST" }
+              - column: { name: name, value: "加班审批" }
+              - column: { name: business_type, value: "AT_OVERTIME_REQUEST" }
+              - column:
+                  name: nodes
+                  value: '[{"seq":1,"name":"管理员审批","approverRule":"ROLE:ADMIN"}]'
+              - column: { name: enabled, valueBoolean: true }
+              - column: { name: deleted, valueBoolean: false }
+              - column: { name: version, valueNumeric: 0 }
+              - column: { name: tenant_id, valueNumeric: 1 }
+      rollback:
+        - delete:
+            tableName: approval_definition
+            where: "code IN ('AT_LEAVE_REQUEST', 'AT_OVERTIME_REQUEST')"
+
+  # ============================================================
+  # 06-14 — Seed leave/overtime permissions
+  # ============================================================
+  - changeSet:
+      id: 06-14-seed-leave-permissions
+      author: dev-be
+      comment: Insert leave and overtime module permissions
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 601 }
+              - column: { name: code, value: "at:leave-type:edit" }
+              - column: { name: name, value: "编辑假类" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 602 }
+              - column: { name: code, value: "at:leave-type:list" }
+              - column: { name: name, value: "查看假类" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 603 }
+              - column: { name: code, value: "at:leave-balance:list" }
+              - column: { name: name, value: "查看假期余额" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 604 }
+              - column: { name: code, value: "at:leave:submit" }
+              - column: { name: name, value: "提交请假单" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 605 }
+              - column: { name: code, value: "at:leave:list" }
+              - column: { name: name, value: "查看请假单" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 606 }
+              - column: { name: code, value: "at:overtime:submit" }
+              - column: { name: name, value: "提交加班单" }
+              - column: { name: type, value: "button" }
+        - insert:
+            tableName: sys_permission
+            columns:
+              - column: { name: id, valueNumeric: 607 }
+              - column: { name: code, value: "at:overtime:list" }
+              - column: { name: name, value: "查看加班单" }
+              - column: { name: type, value: "button" }
+      rollback:
+        - delete:
+            tableName: sys_permission
+            where: "id BETWEEN 601 AND 607"
+
+  # ============================================================
+  # 06-15 — Map permissions to ADMIN role
+  # ============================================================
+  - changeSet:
+      id: 06-15-seed-admin-role-leave-permissions
+      author: dev-be
+      comment: Map leave/overtime permissions to ADMIN role
+      context: seed
+      changes:
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90008 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 601 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90009 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 602 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90010 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 603 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90011 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 604 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90012 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 605 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90013 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 606 }
+        - insert:
+            tableName: sys_role_permission
+            columns:
+              - column: { name: id, valueNumeric: 90014 }
+              - column: { name: role_id, valueNumeric: 1 }
+              - column: { name: permission_id, valueNumeric: 607 }
+      rollback:
+        - delete:
+            tableName: sys_role_permission
+            where: "role_id = 1 AND permission_id BETWEEN 601 AND 607"

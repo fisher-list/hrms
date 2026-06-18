@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: hrms
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:pg}
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: Asia/Shanghai
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: true
+      logic-not-delete-value: false
+  configuration:
+    map-underscore-to-camel-case: true
+
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+    path: /swagger-ui.html
+
+hrms:
+  cors:
+    allowed-origins: ${HRMS_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,http://221.218.211.50:5173}
+  jwt:
+    # MUST be supplied via JWT_SECRET env var. >=32 bytes for HS256.
+    secret: ${JWT_SECRET}
+    access-ttl: PT30M
+    refresh-ttl: P7D
+    issuer: hrms
+    # Set to true when serving over HTTPS (production / staging)
+    refresh-cookie-secure: ${HRMS_COOKIE_SECURE:false}
+  security:
+    # Enable HSTS header — set to true behind TLS-terminating load-balancer
+    hsts-enabled: ${HRMS_HSTS_ENABLED:false}
+  snowflake:
+    worker-id: ${HRMS_SNOWFLAKE_WORKER_ID:1}
+    datacenter-id: ${HRMS_SNOWFLAKE_DATACENTER_ID:1}
+
+# Logging is configured via logback-spring.xml.
+# Override root level via environment variable: LOG_LEVEL=DEBUG

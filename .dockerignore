@@ -1,0 +1,24 @@
+# Docker build context exclusions
+.git
+.gitignore
+.DS_Store
+.idea
+.vscode
+*.md
+*.log
+logs/
+.env
+.env.*
+!.env.example
+
+# Backend build artifacts
+backend/**/target/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Docker files themselves (not needed inside the image)
+Dockerfile
+docker-compose.yml
+.dockerignore
